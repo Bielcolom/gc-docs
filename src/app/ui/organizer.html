@@ -1,0 +1,181 @@
+@let d = drag();
+@let colors = colorOf();
+@let multiDoc = docs().length > 1;
+
+<header class="bar">
+  <div class="bar-start">
+    <div class="seg" role="tablist" aria-label="Organizar por">
+      <button type="button" role="tab" [class.on]="mode() === 'pages'" [attr.aria-selected]="mode() === 'pages'" (click)="mode.set('pages')">
+        <app-icon name="grid" [size]="16" /> Páginas <span class="count">{{ pages().length }}</span>
+      </button>
+      <button type="button" role="tab" [class.on]="mode() === 'docs'" [attr.aria-selected]="mode() === 'docs'" (click)="mode.set('docs')">
+        <app-icon name="files" [size]="16" /> Documentos <span class="count">{{ docs().length }}</span>
+      </button>
+    </div>
+    <p class="hint hide-md">
+      @if (mode() === 'pages') {
+        Arrastra para mover · Ctrl o ⇧ + clic, o un recuadro, para elegir varias
+      } @else {
+        Arrastra un documento para moverlo con todas sus páginas
+      }
+    </p>
+  </div>
+  <div class="bar-end">
+    @if (mode() === 'pages') {
+      <label class="zoom hide-sm" title="Tamaño de las miniaturas">
+        <app-icon name="zoomOut" [size]="15" />
+        <input type="range" min="90" max="300" step="10" [value]="size()" (input)="setSize(num($event))" aria-label="Tamaño de las miniaturas" />
+        <app-icon name="zoomIn" [size]="15" />
+      </label>
+    } @else {
+      <button type="button" class="ghost" (click)="sortDocs('asc')" title="Ordenar por nombre, de la A a la Z"><app-icon name="sortAsc" [size]="16" /> <span class="hide-sm">A → Z</span></button>
+      <button type="button" class="ghost" (click)="sortDocs('desc')" title="Ordenar por nombre, de la Z a la A"><app-icon name="sortDesc" [size]="16" /> <span class="hide-sm">Z → A</span></button>
+    }
+    <button type="button" class="ghost hide-sm" (click)="reverse()" title="Invertir el orden"><app-icon name="reverse" [size]="16" /> Invertir</button>
+    <button type="button" class="ghost" (click)="actions.insertFiles(pages().length)" title="Añadir PDFs o imágenes al final"><app-icon name="filePlus" [size]="16" /> <span class="hide-sm">Añadir</span></button>
+    <button type="button" class="solid" (click)="ui.view.set('edit')">Listo</button>
+  </div>
+</header>
+
+@if (mode() === 'pages') {
+  @if (selCount()) {
+    <div class="selbar" role="toolbar" aria-label="Acciones con la selección">
+      <span class="selcount">{{ selCount() }} {{ selCount() === 1 ? 'página' : 'páginas' }}</span>
+      <div class="group">
+        <button type="button" title="Mover una posición antes (Alt ←)" (click)="shift(-1)"><app-icon name="arrowLeft" [size]="16" /></button>
+        <button type="button" title="Mover una posición después (Alt →)" (click)="shift(1)"><app-icon name="arrowRight" [size]="16" /></button>
+        <button type="button" title="Mover al principio" (click)="toStart()"><app-icon name="toStart" [size]="16" /> <span class="hide-md">Al principio</span></button>
+        <button type="button" title="Mover al final" (click)="toEnd()"><app-icon name="toEnd" [size]="16" /> <span class="hide-md">Al final</span></button>
+      </div>
+      <form class="moveto" (submit)="$event.preventDefault(); applyMoveTo()">
+        <label for="moveto">Mover a la posición</label>
+        <input id="moveto" type="number" min="1" [max]="pages().length" [value]="moveTo()" (input)="moveTo.set(val($event))" placeholder="nº" />
+        <button type="submit" [disabled]="!moveTo()">Mover</button>
+      </form>
+      <div class="group">
+        <button type="button" title="Girar a la izquierda (⇧ R)" (click)="rotate(-90)"><app-icon name="rotateCcw" [size]="16" /></button>
+        <button type="button" title="Girar a la derecha (R)" (click)="rotate(90)"><app-icon name="rotateCw" [size]="16" /></button>
+        <button type="button" title="Duplicar (Ctrl D)" (click)="duplicate()"><app-icon name="copy" [size]="16" /></button>
+        <button type="button" title="Descargar estas páginas en un PDF aparte" (click)="extract()"><app-icon name="extract" [size]="16" /></button>
+        <button type="button" class="danger" title="Eliminar (Supr)" (click)="remove()"><app-icon name="trash" [size]="16" /></button>
+      </div>
+      <div class="group end">
+        <button type="button" (click)="selectAll()">Todas</button>
+        <button type="button" title="Quitar la selección (Esc)" (click)="clearSelection()"><app-icon name="close" [size]="16" /></button>
+      </div>
+    </div>
+  } @else if (multiDoc) {
+    <div class="legend">
+      @for (doc of docs(); track doc.srcId) {
+        <button type="button" class="chip" [style.--doc]="colors.get(doc.srcId)" (click)="selectDoc(doc.srcId, $event.ctrlKey || $event.metaKey)" [title]="'Seleccionar las páginas de ' + doc.name">
+          <span class="dot"></span>{{ doc.name }} <small>{{ doc.pages.length }}</small>
+        </button>
+      }
+    </div>
+  }
+}
+
+<div class="scroller" #scroller (pointerdown)="onBackgroundDown($event)">
+  <div class="grid" #grid [class.docs]="mode() === 'docs'" [class.dragging]="!!d" [style.--col.px]="mode() === 'pages' ? size() : 210">
+    @if (mode() === 'pages') {
+      @for (p of pages(); track p.id; let i = $index) {
+        @let isSel = selected().has(p.id);
+        <div
+          class="card"
+          [attr.data-item]="p.id"
+          [class.sel]="isSel"
+          [class.moving]="d?.kind === 'pages' && d!.ids.includes(p.id)"
+          [style.view-transition-name]="animate() ? 'pg-' + p.id : null"
+          (pointerdown)="onItemDown($event, 'pages', p.id)"
+          (dblclick)="openPage(i)"
+        >
+          <div class="paper" [style.--doc]="colors.get(p.srcId)">
+            <app-thumb [page]="p" [res]="size() * 1.25" />
+            @if (multiDoc) {
+              <span class="stripe" aria-hidden="true"></span>
+            }
+            <button type="button" class="check" [class.on]="isSel" (click)="toggle($event, p.id)" [attr.aria-label]="(isSel ? 'Quitar de la selección' : 'Seleccionar') + ' la página ' + (i + 1)">
+              <app-icon name="check" [size]="12" [stroke]="3" />
+            </button>
+            <button type="button" class="grip" aria-label="Arrastrar para mover"><app-icon name="grip" [size]="16" [stroke]="3" /></button>
+            <div class="ops">
+              <button type="button" title="Girar a la izquierda" (click)="rotate(-90, [p.id])"><app-icon name="rotateCcw" [size]="14" /></button>
+              <button type="button" title="Girar a la derecha" (click)="rotate(90, [p.id])"><app-icon name="rotateCw" [size]="14" /></button>
+              <button type="button" class="danger" title="Eliminar página" (click)="remove([p.id])"><app-icon name="trash" [size]="14" /></button>
+            </div>
+          </div>
+          <div class="meta">
+            <span class="num">{{ i + 1 }}</span>
+            @if (multiDoc) {
+              <span class="src" [title]="docName(p.srcId) + ', página ' + (p.srcIndex + 1)">{{ docName(p.srcId) }} · {{ p.srcIndex + 1 }}</span>
+            }
+          </div>
+        </div>
+      }
+    } @else {
+      @for (doc of docs(); track doc.srcId; let i = $index) {
+        <div
+          class="card doc"
+          [attr.data-item]="doc.srcId"
+          [class.moving]="d?.kind === 'docs' && d!.ids[0] === doc.srcId"
+          [style.view-transition-name]="animate() ? 'doc-' + doc.srcId : null"
+          (pointerdown)="onItemDown($event, 'docs', doc.srcId)"
+          (dblclick)="showDocPages(doc.srcId)"
+        >
+          <div class="stack" [style.--doc]="colors.get(doc.srcId)">
+            @if (doc.pages.length > 2) {
+              <span class="sheet s3"></span>
+            }
+            @if (doc.pages.length > 1) {
+              <span class="sheet s2"></span>
+            }
+            <div class="paper">
+              <app-thumb [page]="doc.pages[0]" [res]="260" />
+              <span class="stripe" aria-hidden="true"></span>
+              <button type="button" class="grip" aria-label="Arrastrar para mover"><app-icon name="grip" [size]="16" [stroke]="3" /></button>
+            </div>
+          </div>
+          <div class="doc-meta">
+            <span class="order">{{ i + 1 }}</span>
+            <div class="doc-text">
+              <b [title]="doc.name">{{ doc.name }}</b>
+              <small>{{ doc.pages.length }} {{ doc.pages.length === 1 ? 'página' : 'páginas' }}</small>
+            </div>
+          </div>
+          <div class="doc-ops">
+            <button type="button" title="Mover antes" [disabled]="i === 0" (click)="moveDoc(doc.srcId, -1)"><app-icon name="arrowLeft" [size]="15" /></button>
+            <button type="button" title="Mover después" [disabled]="i === docs().length - 1" (click)="moveDoc(doc.srcId, 1)"><app-icon name="arrowRight" [size]="15" /></button>
+            <button type="button" title="Ver sus páginas" (click)="showDocPages(doc.srcId)"><app-icon name="grid" [size]="15" /></button>
+            <button type="button" title="Girar todas sus páginas" (click)="rotateDoc(doc.srcId)"><app-icon name="rotateCw" [size]="15" /></button>
+            <button type="button" class="danger" title="Quitar este documento" (click)="removeDoc(doc.srcId)"><app-icon name="trash" [size]="15" /></button>
+          </div>
+        </div>
+      }
+    }
+
+    @if (indicator(); as ind) {
+      <div class="indicator" [style.left.px]="ind.left" [style.top.px]="ind.top" [style.height.px]="ind.height"></div>
+    }
+    @if (marquee(); as m) {
+      <div class="marquee" [style.left.px]="m.x" [style.top.px]="m.y" [style.width.px]="m.w" [style.height.px]="m.h"></div>
+    }
+  </div>
+  @if (mode() === 'docs') {
+    <p class="foot-note">Al mover un documento, todas sus páginas se colocan juntas en su orden actual.</p>
+  }
+</div>
+
+@if (d) {
+  <div class="ghost-drag" [style.left.px]="d.x" [style.top.px]="d.y" aria-hidden="true">
+    @if (d.ids.length > 1) {
+      <span class="ghost-sheet"></span>
+    }
+    <div class="ghost-paper"><app-thumb [page]="d.preview" [res]="140" /></div>
+    @if (d.kind === 'pages' && d.ids.length > 1) {
+      <span class="badge">{{ d.ids.length }}</span>
+    }
+    @if (d.kind === 'docs') {
+      <span class="badge doc">{{ docName(d.ids[0]) }}</span>
+    }
+  </div>
+}

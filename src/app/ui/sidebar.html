@@ -21,7 +21,10 @@
       </div>
     </div>
   } @else {
-    <p class="hint">Arrastra para reordenar · Ctrl/⇧ + clic para seleccionar varias</p>
+    <button type="button" class="organize" (click)="ui.view.set('organize')">
+      <app-icon name="grid" [size]="16" />
+      <span><b>Organizar páginas</b><small>Vista en cuadrícula para mover muchas a la vez</small></span>
+    </button>
   }
 
   <div class="thumbs" (dragover)="$event.preventDefault()" (drop)="onDrop($event)">

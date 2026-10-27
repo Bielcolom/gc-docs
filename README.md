@@ -6,6 +6,8 @@ Editor de PDF completo que funciona en el navegador. Abre un PDF, cambia su text
 
 ![Editor de GC Docs editando el texto de un contrato](docs/editor.png)
 
+![Vista Organizar con páginas de varios PDFs](docs/organizar.png)
+
 ## Funcionalidades
 
 ### Editar
@@ -26,8 +28,14 @@ Editor de PDF completo que funciona en el navegador. Abre un PDF, cambia su text
 - **Firma** dibujada, escrita con tipografía manuscrita o subida desde una foto (con eliminación automática del fondo blanco). Las firmas se recuerdan para la próxima vez.
 - **Formularios PDF:** los campos de texto, casillas, botones de opción y desplegables se vuelven editables.
 
-### Organizar páginas
-- Reordenar arrastrando miniaturas, selección múltiple (`Ctrl`/`⇧` + clic).
+### Organizar páginas y documentos
+- **Vista «Organizar»** (`G`) a pantalla completa con todas las páginas en cuadrícula y tamaño de miniatura ajustable.
+- Arrastrar y soltar una o muchas páginas a la vez, con desplazamiento automático y animación del cambio de orden. En móvil se arrastra desde el asa de cada miniatura.
+- Selección múltiple con `Ctrl`/`⇧` + clic, con un recuadro de selección o con `Ctrl+A`.
+- Mover la selección una posición (`Alt` + flechas), al principio, al final o a una posición concreta.
+- Cada PDF de origen tiene un color, y su nombre aparece bajo cada página para no perderse al unir muchos archivos.
+- **Modo «Documentos»:** reordena PDFs enteros arrastrándolos, ordénalos por nombre (A → Z / Z → A), gíralos o quítalos de una vez.
+- En el editor, el panel lateral también permite reordenar arrastrando las miniaturas.
 - Girar, duplicar y eliminar páginas, o girar todas a la vez.
 - Insertar páginas en blanco, otros PDFs o imágenes en cualquier posición.
 - **Unir** varios PDFs e imágenes en uno.
@@ -87,6 +95,7 @@ src/app/
     ├── tool-rail              Barra de herramientas
     ├── sidebar / thumb        Miniaturas y búsqueda
     ├── inspector              Panel de propiedades
+    ├── organizer              Vista de organización en cuadrícula
     ├── dialogs                Firma, sellos, marca de agua, numeración, dividir…
     └── signature-pad          Lienzo de firma
 ```

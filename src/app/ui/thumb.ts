@@ -31,6 +31,8 @@ import { PageRef } from '../core/models';
 })
 export class Thumb {
   readonly page = input.required<PageRef>();
+  /** Resolución (px del lado mayor) a la que se dibuja la miniatura. */
+  readonly res = input(170);
   private readonly store = inject(DocumentStore);
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly canvas = viewChild.required<ElementRef<HTMLCanvasElement>>('c');
@@ -59,24 +61,34 @@ export class Thumb {
     effect(() => {
       if (!this.visible()) return;
       const p = this.page();
-      const key = `${p.srcId}:${p.srcIndex}`;
+      const res = Math.ceil(this.res() / 60) * 60;
+      const key = `${p.srcId}:${p.srcIndex}:${res}`;
       untracked(() => {
         if (key === this.renderedFor) return;
         this.renderedFor = key;
-        this.render(p);
+        this.render(p, res);
       });
     });
   }
 
-  private async render(p: PageRef): Promise<void> {
+  private seq = 0;
+
+  private async render(p: PageRef, res: number): Promise<void> {
+    const seq = ++this.seq;
     try {
       const page = await this.store.getPdfPage(p.srcId, p.srcIndex);
-      const scale = (170 / Math.max(p.w, p.h)) * Math.min(window.devicePixelRatio || 1, 2);
+      const scale = (res / Math.max(p.w, p.h)) * Math.min(window.devicePixelRatio || 1, 2);
       const vp = page.getViewport({ scale });
+      // Se dibuja en un lienzo aparte para no pisar un render anterior que siga en marcha
+      const off = document.createElement('canvas');
+      off.width = Math.ceil(vp.width);
+      off.height = Math.ceil(vp.height);
+      await page.render({ canvas: off, viewport: vp, background: '#ffffff' }).promise;
+      if (seq !== this.seq) return;
       const c = this.canvas().nativeElement;
-      c.width = Math.ceil(vp.width);
-      c.height = Math.ceil(vp.height);
-      await page.render({ canvas: c, viewport: vp, background: '#ffffff' }).promise;
+      c.width = off.width;
+      c.height = off.height;
+      c.getContext('2d')!.drawImage(off, 0, 0);
     } catch (e: any) {
       if (e?.name !== 'RenderingCancelledException') console.warn(e);
       this.renderedFor = '';

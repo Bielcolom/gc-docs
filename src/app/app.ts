@@ -14,6 +14,7 @@ import { ToolRail } from './ui/tool-rail';
 import { UiService } from './ui/ui.service';
 import { Viewer, ZOOM_STEPS } from './ui/viewer';
 import { Welcome } from './ui/welcome';
+import { Organizer } from './ui/organizer';
 
 const TOOL_KEYS: Record<string, ToolId> = {
   v: 'select',
@@ -31,7 +32,7 @@ const TOOL_KEYS: Record<string, ToolId> = {
 
 @Component({
   selector: 'app-root',
-  imports: [Welcome, Viewer, Sidebar, ToolRail, Inspector, Dialogs, Icon],
+  imports: [Welcome, Viewer, Sidebar, ToolRail, Inspector, Dialogs, Icon, Organizer],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './app.html',
   styleUrl: './app.css',
@@ -55,6 +56,14 @@ export class App {
     this.store.passwordPrompt = (file, incorrect) => this.ui.askPassword(file, incorrect);
     effect(() => {
       document.documentElement.dataset['theme'] = this.ui.theme();
+    });
+    // Al volver del organizador, recolocar el visor en la página actual
+    let lastView = this.ui.view();
+    effect(() => {
+      const v = this.ui.view();
+      if (v === 'edit' && lastView === 'organize') untracked(() => setTimeout(() => this.store.requestScroll(this.store.currentPage()), 0));
+      if (v === 'organize') untracked(() => this.store.selectedId.set(null));
+      lastView = v;
     });
     // Cierra la transacción de una edición de texto aunque el cuadro desaparezca sin perder el foco
     effect(() => {
@@ -160,6 +169,12 @@ export class App {
       return;
     }
     if (typing) return;
+    // El organizador gestiona sus propias teclas
+    if (this.ui.view() === 'organize') return;
+    if (key === 'g' && !e.altKey) {
+      this.ui.view.set('organize');
+      return;
+    }
     // Mientras se abre un cuadro de texto, las teclas no deben cambiar de herramienta
     if (this.store.editingId() && key !== 'escape') return;
 

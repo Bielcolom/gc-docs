@@ -220,6 +220,7 @@
     <section>
       <h3>Organizar</h3>
       <div class="list">
+        <button type="button" (click)="ui.view.set('organize')"><app-icon name="grid" /><span><b>Organizar páginas</b><small>Cuadrícula para reordenar páginas y documentos</small></span></button>
         <button type="button" (click)="actions.insertFiles(store.pages().length)"><app-icon name="filePlus" /><span><b>Unir PDFs</b><small>Añade otros PDFs o imágenes al final</small></span></button>
         <button type="button" (click)="ui.open('split')"><app-icon name="split" /><span><b>Dividir</b><small>Por rangos o cada cierto número de páginas</small></span></button>
         <button type="button" (click)="actions.extractTarget()"><app-icon name="extract" /><span><b>Extraer páginas</b><small>Descarga la página actual o las seleccionadas</small></span></button>

@@ -1,5 +1,5 @@
 @if (store.hasDocument()) {
-  <div class="shell" [class.left-open]="ui.leftOpen()" [class.right-open]="ui.rightOpen()">
+  <div class="shell" [class.left-open]="ui.leftOpen()" [class.right-open]="ui.rightOpen()" [class.organizing]="ui.view() === 'organize'">
     <header class="topbar">
       <div class="start">
         <button type="button" class="brand" title="Cerrar documento" (click)="close()">
@@ -11,7 +11,7 @@
           </svg>
           <span>GC Docs</span>
         </button>
-        <button type="button" class="icon-btn" [class.on]="ui.leftOpen()" title="Panel de páginas" (click)="ui.leftOpen.set(!ui.leftOpen())">
+        <button type="button" class="icon-btn" [class.hidden]="ui.view() === 'organize'" [class.on]="ui.leftOpen()" title="Panel de páginas" (click)="ui.leftOpen.set(!ui.leftOpen())">
           <app-icon name="sidebar" />
         </button>
         <div class="file">
@@ -24,17 +24,27 @@
       </div>
 
       <div class="middle">
+        <div class="views" role="tablist" aria-label="Vista">
+          <button type="button" role="tab" [class.on]="ui.view() === 'edit'" [attr.aria-selected]="ui.view() === 'edit'" (click)="ui.view.set('edit')" title="Editar página a página">
+            <app-icon name="ink" [size]="16" /> <span class="hide-sm">Editar</span>
+          </button>
+          <button type="button" role="tab" [class.on]="ui.view() === 'organize'" [attr.aria-selected]="ui.view() === 'organize'" (click)="ui.view.set('organize')" title="Organizar páginas y documentos (G)">
+            <app-icon name="grid" [size]="16" /> <span class="hide-sm">Organizar</span>
+          </button>
+        </div>
         <div class="group">
           <button type="button" class="icon-btn" title="Deshacer (Ctrl+Z)" [disabled]="!store.canUndo()" (click)="store.undo()"><app-icon name="undo" /></button>
           <button type="button" class="icon-btn" title="Rehacer (Ctrl+Shift+Z)" [disabled]="!store.canRedo()" (click)="store.redo()"><app-icon name="redo" /></button>
         </div>
-        <div class="group zoom hide-sm">
+        @if (ui.view() === 'edit') {
+        <div class="group zoom hide-md">
           <button type="button" class="icon-btn" title="Alejar (Ctrl −)" (click)="zoomStep(-1)"><app-icon name="zoomOut" /></button>
           <button type="button" class="zoom-val" title="Ajustar al ancho (Ctrl 0)" (click)="fit('width')">{{ zoomLabel() }}</button>
           <button type="button" class="icon-btn" title="Acercar (Ctrl +)" (click)="zoomStep(1)"><app-icon name="zoomIn" /></button>
           <button type="button" class="icon-btn" title="Página completa" (click)="fit('page')"><app-icon name="fitWidth" /></button>
         </div>
-        <span class="pager hide-sm">{{ store.currentPage() + 1 }} / {{ store.pages().length }}</span>
+        <span class="pager hide-md">{{ store.currentPage() + 1 }} / {{ store.pages().length }}</span>
+        }
       </div>
 
       <div class="end">
@@ -44,7 +54,7 @@
         <button type="button" class="icon-btn hide-sm" [title]="ui.theme() === 'dark' ? 'Tema claro' : 'Tema oscuro'" (click)="ui.toggleTheme()">
           <app-icon [name]="ui.theme() === 'dark' ? 'sun' : 'moon'" />
         </button>
-        <button type="button" class="icon-btn" [class.on]="ui.rightOpen()" title="Panel de propiedades" (click)="ui.rightOpen.set(!ui.rightOpen())">
+        <button type="button" class="icon-btn" [class.hidden]="ui.view() === 'organize'" [class.on]="ui.rightOpen()" title="Panel de propiedades" (click)="ui.rightOpen.set(!ui.rightOpen())">
           <app-icon name="panel" />
         </button>
         <button type="button" class="solid" (click)="actions.download()" title="Descargar PDF (Ctrl+S)">
@@ -60,6 +70,9 @@
     <app-viewer class="viewer" [class.tool-active]="store.tool() !== 'select'" />
     @if (ui.rightOpen()) {
       <app-inspector class="right" />
+    }
+    @if (ui.view() === 'organize') {
+      <app-organizer class="organizer" />
     }
   </div>
 } @else {

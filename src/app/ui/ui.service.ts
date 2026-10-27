@@ -25,6 +25,8 @@ export class UiService {
   readonly leftOpen = signal(typeof window !== 'undefined' ? window.innerWidth > 900 : true);
   readonly rightOpen = signal(typeof window !== 'undefined' ? window.innerWidth > 1180 : true);
   readonly leftTab = signal<'pages' | 'search'>('pages');
+  /** Vista principal: edición página a página u organizador en cuadrícula. */
+  readonly view = signal<'edit' | 'organize'>('edit');
 
   /** Para el diálogo de contraseña */
   readonly passwordRequest = signal<{ file: string; incorrect: boolean; resolve: (v: string | null) => void } | null>(null);

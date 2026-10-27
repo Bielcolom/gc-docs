@@ -413,9 +413,75 @@ export class DocumentStore {
     this.commit({ ...s, pages });
   }
 
+  /** Coloca las páginas indicadas para que la primera quede en la posición final `index` (base 0). */
+  placePages(ids: string[], index: number): void {
+    const set = new Set(ids);
+    const s = this.state();
+    const moving = s.pages.filter((p) => set.has(p.id));
+    const rest = s.pages.filter((p) => !set.has(p.id));
+    const at = Math.max(0, Math.min(index, rest.length));
+    const pages = [...rest.slice(0, at), ...moving, ...rest.slice(at)];
+    if (pages.every((p, i) => p === s.pages[i])) return;
+    this.commit({ ...s, pages });
+  }
+
+  /** Desplaza las páginas seleccionadas una posición hacia delante o hacia atrás. */
+  shiftPages(ids: string[], dir: -1 | 1): void {
+    const set = new Set(ids);
+    const pages = [...this.state().pages];
+    const idx = pages.map((p, i) => (set.has(p.id) ? i : -1)).filter((i) => i >= 0);
+    if (!idx.length) return;
+    if (dir < 0 && idx[0] === 0) return;
+    if (dir > 0 && idx[idx.length - 1] === pages.length - 1) return;
+    const order = dir < 0 ? idx : [...idx].reverse();
+    for (const i of order) [pages[i], pages[i + dir]] = [pages[i + dir], pages[i]];
+    this.commit({ ...this.state(), pages });
+  }
+
   reversePages(): void {
     const s = this.state();
     this.commit({ ...s, pages: [...s.pages].reverse() });
+  }
+
+  /** Documentos de origen en el orden en que aparecen sus páginas. */
+  readonly documents = computed(() => {
+    const groups = new Map<string, { srcId: string; name: string; pages: PageRef[]; first: number }>();
+    this.state().pages.forEach((p, i) => {
+      let g = groups.get(p.srcId);
+      if (!g) {
+        g = { srcId: p.srcId, name: this.sourceName(p.srcId), pages: [], first: i };
+        groups.set(p.srcId, g);
+      }
+      g.pages.push(p);
+    });
+    return [...groups.values()];
+  });
+
+  sourceName(srcId: string): string {
+    const name = this.sources.get(srcId)?.info.name ?? 'documento';
+    return name.replace(/\.pdf$/i, '');
+  }
+
+  /** Reordena documentos completos. Las páginas de cada documento quedan juntas, en su orden actual. */
+  reorderDocuments(srcOrder: string[]): void {
+    const s = this.state();
+    const bySrc = new Map<string, PageRef[]>();
+    for (const p of s.pages) {
+      const l = bySrc.get(p.srcId) ?? [];
+      l.push(p);
+      bySrc.set(p.srcId, l);
+    }
+    const pages = srcOrder.flatMap((id) => bySrc.get(id) ?? []);
+    for (const [id, l] of bySrc) if (!srcOrder.includes(id)) pages.push(...l);
+    if (pages.every((p, i) => p === s.pages[i])) return;
+    this.commit({ ...s, pages });
+  }
+
+  sortDocuments(dir: 'asc' | 'desc'): void {
+    const docs = [...this.documents()];
+    const collator = new Intl.Collator('es', { numeric: true, sensitivity: 'base' });
+    docs.sort((a, b) => collator.compare(a.name, b.name) * (dir === 'asc' ? 1 : -1));
+    this.reorderDocuments(docs.map((d) => d.srcId));
   }
 
   setFormValue(srcId: string, field: string, value: string | boolean): void {

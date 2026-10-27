@@ -145,6 +145,54 @@
 .rail {
   grid-area: rail;
 }
+.organizer {
+  grid-row: 2 / -1;
+  grid-column: 1 / -1;
+  min-height: 0;
+}
+.shell.organizing .rail,
+.shell.organizing .left,
+.shell.organizing .right,
+.shell.organizing .viewer {
+  display: none;
+}
+.icon-btn.hidden {
+  visibility: hidden;
+}
+
+/* Conmutador Editar / Organizar */
+.views {
+  display: inline-flex;
+  padding: 3px;
+  gap: 2px;
+  margin-right: 8px;
+  border-radius: 10px;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+}
+.views button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--ink-2);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.views button:hover {
+  color: var(--ink);
+}
+.views button.on {
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: 0 1px 2px rgba(22, 38, 58, 0.14), 0 0 0 1px var(--line);
+}
 .left {
   grid-area: left;
   width: 220px;
@@ -236,6 +284,9 @@
 }
 
 @media (max-width: 1180px) {
+  .hide-md {
+    display: none !important;
+  }
   .right {
     position: fixed;
     top: 56px;
@@ -284,8 +335,7 @@
     border-radius: 16px 16px 0 0;
   }
   .file {
-    padding: 0 4px;
-    flex: 1;
+    display: none;
   }
   .ext {
     display: none;
@@ -305,6 +355,12 @@
   }
   .brand span {
     display: none;
+  }
+  .views {
+    margin-right: 2px;
+  }
+  .views button {
+    padding: 0 9px;
   }
 }
 @media (max-width: 420px) {
