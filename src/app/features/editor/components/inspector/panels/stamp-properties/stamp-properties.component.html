@@ -1,0 +1,19 @@
+<section class="section">
+  <label class="form-label" for="stamp-label">Texto</label>
+  <input
+    id="stamp-label"
+    class="form-input"
+    [value]="label()"
+    (input)="onLabel($event)"
+    (keydown)="$event.stopPropagation()"
+  />
+</section>
+<section class="section">
+  <span class="form-label">Color</span>
+  <app-color-swatches
+    label="Color del sello"
+    [colors]="colors"
+    [value]="target.color()"
+    (valueChange)="target.setColor($event)"
+  />
+</section>

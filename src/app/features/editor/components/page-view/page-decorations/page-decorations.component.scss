@@ -1,0 +1,50 @@
+:host {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.watermark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  font-family: Helvetica, Arial, sans-serif;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.page-number {
+  position: absolute;
+  font-family: Helvetica, Arial, sans-serif;
+  line-height: 1;
+  white-space: nowrap;
+
+  &--bottom-center,
+  &--top-center {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  &--bottom-left,
+  &--top-left {
+    left: var(--margin);
+  }
+
+  &--bottom-right,
+  &--top-right {
+    right: var(--margin);
+  }
+
+  &--bottom-left,
+  &--bottom-center,
+  &--bottom-right {
+    bottom: var(--margin);
+  }
+
+  &--top-left,
+  &--top-center,
+  &--top-right {
+    top: var(--margin);
+  }
+}

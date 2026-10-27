@@ -1,0 +1,119 @@
+@let z = zoom();
+@let p = page();
+@let size = displaySize();
+@let visible = viewport.isVisible();
+
+<div
+  #sheet
+  class="sheet"
+  [style.width.px]="size.w * z"
+  [style.height.px]="size.h * z"
+  (dragover)="onDragOver($event)"
+  (drop)="onDrop($event)"
+>
+  <div
+    class="page"
+    [class.is-interactive]="isInteractive()"
+    [class.is-editing-text]="tool() === 'edit-text'"
+    [style.width.px]="p.width * z"
+    [style.height.px]="p.height * z"
+    [style.transform]="pageTransform()"
+    [style.cursor]="cursor()"
+    (pointerdown)="onPagePointerDown($event)"
+  >
+    <canvas #canvas class="canvas" aria-hidden="true"></canvas>
+    @if (!rendered()) {
+      <div class="placeholder" aria-hidden="true"></div>
+    }
+
+    @if (visible) {
+      @for (edit of covers(); track edit.id) {
+        @if (edit.cover; as cover) {
+          <div
+            class="cover"
+            [style.left.px]="cover.x * z"
+            [style.top.px]="cover.y * z"
+            [style.width.px]="cover.w * z"
+            [style.height.px]="cover.h * z"
+            [style.background]="cover.color"
+          ></div>
+        }
+      }
+
+      <app-form-field-layer [page]="p" [zoom]="z" />
+
+      @if (tool() === 'edit-text') {
+        <app-text-line-layer
+          [page]="p"
+          [zoom]="z"
+          [editedKeys]="editedLineKeys()"
+          (lineSelected)="onLineSelected($event)"
+        />
+      }
+
+      <!-- Un solo bucle para respetar el orden de apilado (Delante / Detrás) -->
+      @for (a of annotations(); track a.id) {
+        @if (a.type === 'text') {
+          <app-text-annotation
+            [annotation]="a"
+            [zoom]="z"
+            [editing]="editorStore.editingAnnotationId() === a.id"
+            [class.is-interactive]="isInteractive()"
+            (pointerdown)="onAnnotationPointerDown($event, a)"
+            (dblclick)="onAnnotationDoubleClick($event, a)"
+            (contentChange)="onTextInput(a, $event)"
+            (editEnd)="onTextEditEnd(a, $event)"
+            (sizeChange)="onTextSizeChange(a, $event)"
+          />
+        } @else {
+          <app-annotation-view
+            [annotation]="a"
+            [zoom]="z"
+            [class.is-interactive]="tool() === 'select'"
+            (pointerdown)="onAnnotationPointerDown($event, a)"
+            (dblclick)="onAnnotationDoubleClick($event, a)"
+          />
+        }
+      }
+      @if (draft(); as d) {
+        <app-annotation-view class="is-draft" [annotation]="d" [zoom]="z" />
+      }
+
+      @for (hit of searchHits(); track $index) {
+        <div
+          class="search-hit"
+          [class.is-active]="hit.active"
+          [style.left.px]="hit.x * z"
+          [style.top.px]="hit.y * z"
+          [style.width.px]="hit.width * z"
+          [style.height.px]="hit.height * z"
+        ></div>
+      }
+
+      @if (showSelection() && selected(); as s) {
+        <app-selection-overlay
+          [annotation]="s"
+          [zoom]="z"
+          (handleDragStart)="onHandleDragStart($event)"
+          (editRequest)="editSelected()"
+          (duplicateRequest)="duplicateSelected()"
+          (removeRequest)="removeAnnotation(s.id)"
+        />
+      }
+
+      @if (editingNote(); as note) {
+        <app-note-popover
+          [note]="note"
+          [zoom]="z"
+          (textChange)="onNoteText(note, $event)"
+          (closeRequest)="closeNote()"
+          (removeRequest)="removeAnnotation(note.id)"
+        />
+      }
+    }
+  </div>
+
+  @if (visible) {
+    <app-page-decorations [pageIndex]="index()" [zoom]="z" />
+  }
+</div>

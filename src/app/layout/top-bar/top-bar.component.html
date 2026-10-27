@@ -1,0 +1,178 @@
+<div class="start">
+  <button type="button" class="brand" title="Cerrar el documento" (click)="close()">
+    <app-brand-logo class="compact-on-mobile" />
+  </button>
+  @if (isEditor()) {
+    <button
+      type="button"
+      class="btn btn--icon"
+      title="Panel de páginas"
+      aria-label="Mostrar u ocultar el panel de páginas"
+      [class.is-active]="editorStore.sidebarOpen()"
+      [attr.aria-pressed]="editorStore.sidebarOpen()"
+      (click)="editorStore.sidebarOpen.set(!editorStore.sidebarOpen())"
+    >
+      <app-icon name="sidebar" />
+    </button>
+  }
+  <div class="file">
+    <input
+      class="file__name"
+      type="text"
+      spellcheck="false"
+      aria-label="Nombre del archivo"
+      [value]="documentStore.fileName()"
+      (change)="rename($event)"
+      (keydown.enter)="blur($event)"
+    />
+    <span class="file__ext">.pdf</span>
+    @if (documentStore.hasUnsavedChanges()) {
+      <span class="file__dirty" title="Hay cambios sin descargar"></span>
+    }
+  </div>
+</div>
+
+<div class="middle">
+  <nav class="segmented" aria-label="Vista">
+    <a
+      class="segmented__option"
+      [routerLink]="paths.editor"
+      routerLinkActive="is-active"
+      ariaCurrentWhenActive="page"
+      title="Editar página a página"
+    >
+      <app-icon name="pen" [size]="16" /> <span class="hide-sm">Editar</span>
+    </a>
+    <a
+      class="segmented__option"
+      [routerLink]="paths.organizer"
+      routerLinkActive="is-active"
+      ariaCurrentWhenActive="page"
+      title="Organizar páginas y documentos (G)"
+    >
+      <app-icon name="grid" [size]="16" /> <span class="hide-sm">Organizar</span>
+    </a>
+  </nav>
+  <div class="group">
+    <button
+      type="button"
+      class="btn btn--icon"
+      title="Deshacer (Ctrl+Z)"
+      aria-label="Deshacer"
+      [disabled]="!documentStore.canUndo()"
+      (click)="documentStore.undo()"
+    >
+      <app-icon name="undo" />
+    </button>
+    <button
+      type="button"
+      class="btn btn--icon"
+      title="Rehacer (Ctrl+Shift+Z)"
+      aria-label="Rehacer"
+      [disabled]="!documentStore.canRedo()"
+      (click)="documentStore.redo()"
+    >
+      <app-icon name="redo" />
+    </button>
+  </div>
+  @if (isEditor()) {
+    <div class="group hide-md">
+      <button
+        type="button"
+        class="btn btn--icon"
+        title="Alejar (Ctrl −)"
+        aria-label="Alejar"
+        (click)="editorStore.stepZoom(-1)"
+      >
+        <app-icon name="zoomOut" />
+      </button>
+      <button
+        type="button"
+        class="zoom-value"
+        title="Ajustar al ancho (Ctrl 0)"
+        (click)="editorStore.requestFit('width')"
+      >
+        {{ zoomLabel() }}
+      </button>
+      <button
+        type="button"
+        class="btn btn--icon"
+        title="Acercar (Ctrl +)"
+        aria-label="Acercar"
+        (click)="editorStore.stepZoom(1)"
+      >
+        <app-icon name="zoomIn" />
+      </button>
+      <button
+        type="button"
+        class="btn btn--icon"
+        title="Ver la página completa"
+        aria-label="Ver la página completa"
+        (click)="editorStore.requestFit('page')"
+      >
+        <app-icon name="fitPage" />
+      </button>
+    </div>
+    <span class="pager hide-md" aria-live="polite">{{ pageLabel() }}</span>
+  }
+</div>
+
+<div class="end">
+  <button
+    type="button"
+    class="btn btn--icon hide-sm"
+    title="Abrir otro PDF (Ctrl+O)"
+    aria-label="Abrir otro PDF"
+    (click)="openOther()"
+  >
+    <app-icon name="folder" />
+  </button>
+  <button
+    type="button"
+    class="btn btn--icon hide-sm"
+    title="Imprimir (Ctrl+P)"
+    aria-label="Imprimir"
+    (click)="actions.print()"
+  >
+    <app-icon name="printer" />
+  </button>
+  <button
+    type="button"
+    class="btn btn--icon hide-sm"
+    title="Atajos de teclado (?)"
+    aria-label="Atajos de teclado"
+    (click)="dialogs.openShortcuts()"
+  >
+    <app-icon name="keyboard" />
+  </button>
+  <button
+    type="button"
+    class="btn btn--icon hide-sm"
+    [title]="theme.theme() === 'dark' ? 'Tema claro' : 'Tema oscuro'"
+    [attr.aria-label]="theme.theme() === 'dark' ? 'Cambiar a tema claro' : 'Cambiar a tema oscuro'"
+    (click)="theme.toggle()"
+  >
+    <app-icon [name]="theme.theme() === 'dark' ? 'sun' : 'moon'" />
+  </button>
+  @if (isEditor()) {
+    <button
+      type="button"
+      class="btn btn--icon"
+      title="Panel de propiedades"
+      aria-label="Mostrar u ocultar el panel de propiedades"
+      [class.is-active]="editorStore.inspectorOpen()"
+      [attr.aria-pressed]="editorStore.inspectorOpen()"
+      (click)="editorStore.inspectorOpen.set(!editorStore.inspectorOpen())"
+    >
+      <app-icon name="panel" />
+    </button>
+  }
+  <button
+    type="button"
+    class="btn btn--primary"
+    title="Descargar PDF (Ctrl+S)"
+    (click)="actions.download()"
+  >
+    <app-icon name="download" [size]="17" /> <span class="hide-xs">Descargar</span>
+  </button>
+</div>

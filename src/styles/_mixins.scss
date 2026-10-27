@@ -1,0 +1,73 @@
+@mixin focus-ring($offset: 2px) {
+  &:focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: $offset;
+  }
+}
+
+@mixin visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@mixin truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/// Fondo de "mesa de trabajo" con puntos.
+@mixin desk-background {
+  background:
+    radial-gradient(circle at 1px 1px, var(--color-desk-dot) 1px, transparent 0) 0 0 / 22px 22px,
+    var(--color-desk);
+}
+
+/// Sombra de una hoja de papel.
+@mixin paper($strong: false) {
+  background: #fff;
+  @if $strong {
+    box-shadow:
+      0 0 0 1px var(--color-sheet-edge-strong),
+      0 1px 2px rgb(22 38 58 / 8%),
+      0 12px 36px -12px rgb(22 38 58 / 32%);
+  } @else {
+    box-shadow:
+      0 0 0 1px var(--color-sheet-edge),
+      0 1px 2px rgb(22 38 58 / 6%),
+      0 8px 28px -10px rgb(22 38 58 / 22%);
+  }
+}
+
+/// Tarjeta flotante (menús, popovers).
+@mixin popover {
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-pop);
+}
+
+/// Trazo de rotulador fluorescente que marca el elemento activo.
+@mixin marker-swipe {
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 7px 3px 6px 4px;
+    z-index: -1;
+    background: var(--color-marker);
+    border-radius: 4px 12px 5px 14px / 12px 5px 13px 4px;
+    transform: rotate(-4deg) skewX(-6deg);
+    animation: marker-swipe 0.22s ease-out;
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
+  }
+}

@@ -1,0 +1,25 @@
+<div
+  #scroller
+  class="scroller"
+  (scroll)="onScroll()"
+  (wheel)="onWheel($event)"
+  (dragover)="onDragOver($event)"
+  (drop)="onDrop($event)"
+  (pointerdown)="onBackgroundPointerDown($event)"
+>
+  <div class="pages">
+    @for (page of documentStore.pages(); track page.id; let i = $index) {
+      <div class="slot">
+        <app-page-view
+          [page]="page"
+          [index]="i"
+          [zoom]="editorStore.zoom()"
+          [appInViewportMargin]="preloadMargin"
+        />
+        <span class="label"
+          >{{ i + 1 }} <span class="label__total">de {{ documentStore.pageCount() }}</span></span
+        >
+      </div>
+    }
+  </div>
+</div>

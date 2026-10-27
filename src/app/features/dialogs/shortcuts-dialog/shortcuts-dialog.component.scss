@@ -1,0 +1,30 @@
+.groups {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 22px;
+}
+
+.group-title {
+  margin: 0 0 10px;
+  font-size: 13px;
+}
+
+.list {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 8px 10px;
+  align-items: center;
+  margin: 0;
+  font-size: 13px;
+  color: var(--color-ink-2);
+
+  dt {
+    display: flex;
+    gap: 3px;
+    white-space: nowrap;
+  }
+
+  dd {
+    margin: 0;
+  }
+}

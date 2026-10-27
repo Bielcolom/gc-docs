@@ -1,0 +1,38 @@
+<app-dialog-shell title="Propiedades del documento">
+  <form [formGroup]="form" class="settings">
+    <div>
+      <label class="form-label" for="meta-title">Título</label>
+      <input
+        id="meta-title"
+        class="form-input"
+        type="text"
+        formControlName="title"
+        [placeholder]="store.fileName()"
+      />
+    </div>
+    <div>
+      <label class="form-label" for="meta-author">Autor</label>
+      <input id="meta-author" class="form-input" type="text" formControlName="author" />
+    </div>
+    <div>
+      <label class="form-label" for="meta-subject">Asunto</label>
+      <input id="meta-subject" class="form-input" type="text" formControlName="subject" />
+    </div>
+    <div>
+      <label class="form-label" for="meta-keywords">Palabras clave</label>
+      <input
+        id="meta-keywords"
+        class="form-input"
+        type="text"
+        formControlName="keywords"
+        placeholder="contrato, 2026, cliente"
+      />
+    </div>
+    <p class="form-hint">
+      Se guardan dentro del PDF al descargarlo. Los campos vacíos conservan el valor original.
+    </p>
+  </form>
+  <ng-container dialogFooter>
+    <button type="button" class="btn btn--primary" (click)="dialogRef.close()">Hecho</button>
+  </ng-container>
+</app-dialog-shell>

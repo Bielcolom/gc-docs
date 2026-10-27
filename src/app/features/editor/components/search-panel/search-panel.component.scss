@@ -1,0 +1,105 @@
+@use 'mixins' as m;
+
+:host {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  padding: 12px 10px 0;
+}
+
+.search-box {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  height: 38px;
+  padding: 0 10px;
+  color: var(--color-ink-3);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-line-strong);
+  border-radius: var(--radius-md);
+
+  &:focus-within {
+    border-color: var(--color-ink);
+    box-shadow: 0 0 0 3px var(--color-focus-soft);
+  }
+
+  input {
+    flex: 1;
+    min-width: 0;
+    font-size: 14px;
+    color: var(--color-ink);
+    background: transparent;
+    border: 0;
+    outline: none;
+  }
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 4px;
+  font-size: 12.5px;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-ink-2);
+
+  .btn--sm {
+    width: 28px;
+    height: 28px;
+  }
+}
+
+.results {
+  flex: 1;
+  padding: 0 6px 16px;
+  margin: 0 -10px;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.result {
+  display: grid;
+  gap: 2px;
+  width: 100%;
+  padding: 8px 10px;
+  color: var(--color-ink-2);
+  text-align: left;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  border-radius: 8px;
+
+  &:hover,
+  &.is-active {
+    background: var(--color-surface-2);
+  }
+
+  &.is-active {
+    box-shadow: inset 3px 0 0 var(--color-marker-deep);
+  }
+
+  &__page {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--color-ink-3);
+  }
+
+  &__snippet {
+    @include m.truncate;
+
+    font-size: 13px;
+    line-height: 1.35;
+  }
+
+  mark {
+    padding: 0 1px;
+    color: #16263a;
+    background: var(--color-marker);
+    border-radius: 2px;
+  }
+}
+
+.form-hint {
+  margin: 10px 4px;
+}

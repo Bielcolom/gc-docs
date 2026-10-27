@@ -1,0 +1,276 @@
+@use 'breakpoints' as bp;
+@use 'mixins' as m;
+
+:host {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.selection-bar {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 6px 6px 10px;
+  margin: 10px 10px 2px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-inverse-ink);
+  background: var(--color-inverse);
+  border-radius: 10px;
+
+  &__actions {
+    display: flex;
+  }
+
+  button {
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    color: inherit;
+    cursor: pointer;
+    background: transparent;
+    border: 0;
+    border-radius: var(--radius-sm);
+
+    &:hover {
+      background: rgb(127 127 127 / 20%);
+    }
+
+    &.danger:hover {
+      color: #ff8a80;
+    }
+  }
+}
+
+.organize-link {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 9px 10px;
+  margin: 10px 10px 2px;
+  text-align: left;
+  cursor: pointer;
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
+  border-radius: 10px;
+
+  @include m.focus-ring;
+
+  &:hover {
+    background: var(--color-surface-2);
+    border-color: var(--color-line-strong);
+  }
+
+  span {
+    display: grid;
+    gap: 1px;
+  }
+
+  strong {
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  small {
+    font-size: 11.5px;
+    line-height: 1.3;
+    color: var(--color-ink-3);
+  }
+}
+
+.list {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 22px 20px;
+  margin: 0;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  align-items: center;
+  padding: 8px 8px 4px;
+  cursor: pointer;
+  border-radius: 10px;
+  outline: none;
+
+  &:focus-visible {
+    box-shadow: 0 0 0 2px var(--color-focus);
+  }
+
+  &:hover {
+    background: var(--color-surface-2);
+  }
+
+  &__paper {
+    position: relative;
+    width: 100%;
+    max-width: 150px;
+    background: #fff;
+    box-shadow:
+      0 0 0 1px var(--color-sheet-edge),
+      0 2px 6px -2px rgb(22 38 58 / 20%);
+  }
+
+  &.is-current &__paper {
+    box-shadow:
+      0 0 0 2px var(--color-ink),
+      0 4px 10px -3px rgb(22 38 58 / 30%);
+  }
+
+  &.is-selected &__paper {
+    box-shadow:
+      0 0 0 2.5px var(--color-selection),
+      0 4px 10px -3px rgb(22 38 58 / 30%);
+  }
+
+  &__number {
+    font-size: 12px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-ink-2);
+  }
+
+  &.is-current &__number {
+    color: var(--color-ink);
+  }
+
+  &__edited {
+    position: absolute;
+    bottom: 6px;
+    left: 6px;
+    width: 9px;
+    height: 9px;
+    background: var(--color-marker);
+    border-radius: 50%;
+    box-shadow:
+      0 0 0 1.5px #fff,
+      0 0 0 2.5px rgb(0 0 0 / 15%);
+  }
+
+  &__check {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    display: grid;
+    place-items: center;
+    width: 20px;
+    height: 20px;
+    color: transparent;
+    cursor: pointer;
+    background: #fff;
+    border: 1.5px solid #9aa5b1;
+    border-radius: var(--radius-sm);
+    opacity: 0;
+    transition: opacity 0.12s;
+
+    &.is-on {
+      color: #fff;
+      background: var(--color-selection);
+      border-color: var(--color-selection);
+      opacity: 1;
+    }
+  }
+
+  &__actions {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    opacity: 0;
+    transition: opacity 0.12s;
+
+    button {
+      display: grid;
+      place-items: center;
+      width: 26px;
+      height: 26px;
+      cursor: pointer;
+      background: var(--color-surface);
+      border: 1px solid var(--color-line);
+      border-radius: 7px;
+      box-shadow: 0 1px 3px rgb(0 0 0 / 12%);
+
+      &:hover {
+        background: var(--color-surface-2);
+      }
+
+      &.danger:hover {
+        color: var(--color-danger);
+      }
+    }
+  }
+
+  &:hover &__actions,
+  &:hover &__check,
+  &:focus-within &__actions,
+  &:focus-within &__check {
+    opacity: 1;
+  }
+
+  @include bp.no-hover {
+    &__actions,
+    &__check {
+      opacity: 1;
+    }
+  }
+
+  &__placeholder {
+    width: 100%;
+    max-width: 150px;
+    height: 6px;
+    background: var(--color-marker-deep);
+    border-radius: 3px;
+  }
+}
+
+// Clases que añade Angular CDK durante el arrastre
+.cdk-drag-preview {
+  background: var(--color-surface);
+  border-radius: 10px;
+  box-shadow: var(--shadow-pop);
+}
+
+.cdk-drag-animating,
+.list.cdk-drop-list-dragging .item:not(.cdk-drag-placeholder) {
+  transition: transform 0.2s cubic-bezier(0, 0, 0.2, 1);
+}
+
+.footer {
+  display: grid;
+  gap: 6px;
+  padding: 10px;
+  border-top: 1px solid var(--color-line);
+}
+
+.add-button {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  height: 36px;
+  padding: 0 12px;
+  font-size: 13px;
+  color: var(--color-ink-2);
+  cursor: pointer;
+  background: transparent;
+  border: 1px dashed var(--color-line-strong);
+  border-radius: var(--radius-md);
+
+  &:hover {
+    color: var(--color-ink);
+    background: var(--color-surface-2);
+    border-style: solid;
+  }
+}

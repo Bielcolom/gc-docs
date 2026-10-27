@@ -1,0 +1,55 @@
+@use '@angular/cdk' as cdk;
+@use 'mixins' as m;
+
+// Estructura base de los overlays de Angular CDK (diálogos y menús).
+@include cdk.overlay;
+@include cdk.a11y-visually-hidden;
+
+.app-dialog-backdrop {
+  background: var(--color-scrim);
+}
+
+.app-dialog-panel {
+  max-width: calc(100vw - 32px);
+}
+
+// Menús desplegables de CDK (`cdkMenu`).
+.app-menu {
+  @include m.popover;
+
+  min-width: 190px;
+  padding: 5px;
+
+  &__item {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    width: 100%;
+    padding: 8px 10px;
+    font-size: 13.5px;
+    color: var(--color-ink);
+    text-align: left;
+    cursor: pointer;
+    background: transparent;
+    border: 0;
+    border-radius: 8px;
+
+    &:hover,
+    &:focus {
+      outline: none;
+      background: var(--color-surface-2);
+    }
+
+    &.is-active {
+      background: var(--color-marker-soft);
+    }
+
+    span {
+      flex: 1;
+    }
+
+    kbd {
+      color: var(--color-ink-3);
+    }
+  }
+}

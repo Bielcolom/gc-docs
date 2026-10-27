@@ -1,0 +1,19 @@
+<app-dialog-shell title="Atajos de teclado" [wide]="true">
+  <div class="groups">
+    @for (group of groups; track group.title) {
+      <section>
+        <h3 class="group-title">{{ group.title }}</h3>
+        <dl class="list">
+          @for (item of group.items; track item.description) {
+            <dt>
+              @for (key of item.keys; track $index) {
+                <kbd>{{ key }}</kbd>
+              }
+            </dt>
+            <dd>{{ item.description }}</dd>
+          }
+        </dl>
+      </section>
+    }
+  </div>
+</app-dialog-shell>

@@ -1,0 +1,21 @@
+// Puntos de corte de la aplicación. Úsalos siempre con el mixin `down`.
+$breakpoints: (
+  xs: 420px,
+  sm: 700px,
+  md: 900px,
+  lg: 1180px,
+);
+
+/// Aplica estilos por debajo del punto de corte indicado.
+/// @example scss  @include bp.down(sm) { … }
+@mixin down($name) {
+  @media (max-width: map-get($breakpoints, $name)) {
+    @content;
+  }
+}
+
+@mixin no-hover {
+  @media (hover: none) {
+    @content;
+  }
+}

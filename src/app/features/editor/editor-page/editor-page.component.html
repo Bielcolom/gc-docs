@@ -1,0 +1,8 @@
+<app-tool-rail class="rail" />
+@if (editorStore.sidebarOpen()) {
+  <app-editor-sidebar class="sidebar" />
+}
+<app-document-viewer class="viewer" />
+@if (editorStore.inspectorOpen()) {
+  <app-inspector class="inspector" />
+}

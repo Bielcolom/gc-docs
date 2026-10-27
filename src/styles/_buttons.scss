@@ -1,0 +1,166 @@
+@use 'mixins' as m;
+
+// Botones de la aplicación. Uso: <button class="btn btn--primary">.
+.btn {
+  display: inline-flex;
+  flex: none;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  padding: 0 14px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--color-ink);
+  white-space: nowrap;
+  cursor: pointer;
+  background: var(--color-surface);
+  border: 1px solid var(--color-line-strong);
+  border-radius: var(--radius-md);
+  transition:
+    background 0.12s,
+    box-shadow 0.15s,
+    transform 0.08s;
+
+  @include m.focus-ring;
+
+  &:hover:not(:disabled) {
+    background: var(--color-surface-2);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(1px);
+  }
+
+  &:disabled {
+    cursor: default;
+    opacity: 0.4;
+  }
+
+  &--primary {
+    font-weight: 600;
+    color: var(--color-inverse-ink);
+    background: var(--color-inverse);
+    border-color: transparent;
+
+    &:hover:not(:disabled) {
+      background: var(--color-inverse);
+      box-shadow: 0 0 0 3px var(--color-focus-soft);
+    }
+  }
+
+  &--ghost {
+    background: transparent;
+    border-color: transparent;
+  }
+
+  &--danger {
+    color: var(--color-danger);
+  }
+
+  &--danger-hover:hover:not(:disabled) {
+    color: var(--color-danger);
+    border-color: var(--color-danger);
+  }
+
+  &--lg {
+    height: 48px;
+    padding: 0 22px;
+    font-size: 16px;
+    border-radius: 11px;
+  }
+
+  &--sm {
+    height: 30px;
+    padding: 0 10px;
+    font-size: 12.5px;
+  }
+
+  &--icon {
+    width: 36px;
+    padding: 0;
+    color: var(--color-ink-2);
+    background: transparent;
+    border-color: transparent;
+
+    &:hover:not(:disabled) {
+      color: var(--color-ink);
+    }
+
+    &.is-active {
+      color: var(--color-ink);
+      background: var(--color-surface-2);
+    }
+  }
+}
+
+// Control segmentado: grupo de botones excluyentes.
+.segmented {
+  display: inline-flex;
+  flex: none;
+  gap: 2px;
+  padding: 3px;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-line);
+  border-radius: 10px;
+
+  &--block {
+    display: flex;
+  }
+
+  &__option {
+    display: flex;
+    flex: 1;
+    gap: 6px;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    height: 30px;
+    padding: 0 12px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-ink-2);
+    cursor: pointer;
+    background: transparent;
+    border: 0;
+    border-radius: 7px;
+
+    @include m.focus-ring(1px);
+
+    &:hover {
+      color: var(--color-ink);
+    }
+
+    &.is-active {
+      color: var(--color-ink);
+      background: var(--color-surface);
+      box-shadow:
+        0 1px 2px rgb(22 38 58 / 14%),
+        0 0 0 1px var(--color-line);
+    }
+  }
+}
+
+.badge {
+  padding: 1px 6px;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-ink-2);
+  background: var(--color-line);
+  border-radius: 99px;
+}
+
+kbd {
+  display: inline-block;
+  min-width: 22px;
+  padding: 2px 6px;
+  font-family: inherit;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--color-ink);
+  text-align: center;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-line-strong);
+  border-bottom-width: 2px;
+  border-radius: 5px;
+}

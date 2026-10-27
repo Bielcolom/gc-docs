@@ -1,0 +1,32 @@
+<section class="section">
+  <span class="form-label">Tipo</span>
+  <div class="segmented segmented--block" role="radiogroup" aria-label="Tipo de marca">
+    @for (mode of modes; track mode.id) {
+      <button
+        type="button"
+        role="radio"
+        class="segmented__option"
+        [class.is-active]="target.highlightMode() === mode.id"
+        [attr.aria-checked]="target.highlightMode() === mode.id"
+        (click)="target.setHighlightMode(mode.id)"
+      >
+        {{ mode.label }}
+      </button>
+    }
+  </div>
+</section>
+<section class="section">
+  <span class="form-label">Color</span>
+  <app-color-swatches
+    label="Color de la marca"
+    [colors]="colors()"
+    [value]="target.color()"
+    (valueChange)="target.setColor($event)"
+  />
+</section>
+@if (!target.annotation()) {
+  <p class="form-hint">
+    Arrastra sobre el texto que quieras marcar. La herramienta sigue activa para que marques varias
+    zonas seguidas.
+  </p>
+}

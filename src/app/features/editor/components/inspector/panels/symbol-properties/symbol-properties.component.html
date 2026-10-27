@@ -1,0 +1,46 @@
+<section class="section">
+  <span class="form-label">Marca</span>
+  <div class="segmented segmented--block" role="radiogroup" aria-label="Marca">
+    @for (option of kinds; track option.kind) {
+      <button
+        type="button"
+        role="radio"
+        class="segmented__option"
+        [attr.aria-label]="option.label"
+        [class.is-active]="target.symbol() === option.kind"
+        [attr.aria-checked]="target.symbol() === option.kind"
+        (click)="target.setSymbol(option.kind)"
+      >
+        <app-icon [name]="option.icon" [size]="16" [strokeWidth]="2.6" />
+      </button>
+    }
+  </div>
+</section>
+<section class="section">
+  <span class="form-label">Color</span>
+  <app-color-swatches
+    label="Color de la marca"
+    [colors]="palette"
+    [value]="target.color()"
+    (valueChange)="target.setColor($event)"
+  />
+</section>
+@if (target.annotation()) {
+  <section class="section">
+    <label class="form-label" for="symbol-size"
+      >Tamaño <output>{{ symbolSize() }} pt</output></label
+    >
+    <input
+      id="symbol-size"
+      class="form-range"
+      type="range"
+      min="6"
+      max="80"
+      step="1"
+      [value]="symbolSize()"
+      (input)="onSize($event)"
+    />
+  </section>
+} @else {
+  <p class="form-hint">Haz clic donde quieras marcar casillas de un formulario impreso.</p>
+}

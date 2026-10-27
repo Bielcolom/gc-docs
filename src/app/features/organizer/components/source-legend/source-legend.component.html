@@ -1,0 +1,13 @@
+@for (group of groups(); track group.sourceId) {
+  <button
+    type="button"
+    class="chip"
+    [style.--source-color]="colors().get(group.sourceId)"
+    [title]="'Seleccionar las páginas de ' + group.name"
+    (click)="onClick($event, group.sourceId)"
+  >
+    <span class="chip__dot" aria-hidden="true"></span>
+    <span class="chip__name">{{ group.name }}</span>
+    <small>{{ group.pages.length }}</small>
+  </button>
+}

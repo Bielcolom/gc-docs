@@ -1,0 +1,46 @@
+.presets {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(124px, 1fr));
+  gap: 8px;
+}
+
+.stamp {
+  height: 46px;
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--stamp);
+  cursor: pointer;
+  background: #fff;
+  border: 2.5px solid var(--stamp);
+  border-radius: 8px;
+  transform: rotate(-2deg);
+  transition: transform 0.12s;
+
+  &:nth-child(even) {
+    transform: rotate(1.5deg);
+  }
+
+  &:hover,
+  &:focus-visible {
+    transform: rotate(0) scale(1.04);
+  }
+}
+
+.custom {
+  display: grid;
+  gap: 10px;
+  padding-top: 16px;
+  margin-top: 18px;
+  border-top: 1px solid var(--color-line-soft);
+
+  .form-label {
+    margin: 0;
+  }
+
+  &__row {
+    display: flex;
+    gap: 8px;
+  }
+}

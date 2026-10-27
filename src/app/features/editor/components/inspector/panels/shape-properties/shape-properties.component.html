@@ -1,0 +1,35 @@
+<section class="section">
+  <span class="form-label">Borde</span>
+  <app-color-swatches
+    label="Color del borde"
+    [colors]="palette"
+    [value]="target.stroke()"
+    [allowNone]="hasAnnotation()"
+    (valueChange)="target.setStroke($event)"
+  />
+</section>
+<section class="section">
+  <span class="form-label">Relleno</span>
+  <app-color-swatches
+    label="Color de relleno"
+    [colors]="palette"
+    [value]="target.fill()"
+    [allowNone]="true"
+    (valueChange)="target.setFill($event)"
+  />
+</section>
+<section class="section">
+  <label class="form-label" for="shape-width"
+    >Grosor <output>{{ target.strokeWidth() }} pt</output></label
+  >
+  <input
+    id="shape-width"
+    class="form-range"
+    type="range"
+    min="0.5"
+    max="20"
+    step="0.5"
+    [value]="target.strokeWidth()"
+    (input)="onWidth($event)"
+  />
+</section>

@@ -1,0 +1,27 @@
+<section class="section">
+  <span class="form-label">Color</span>
+  <app-color-swatches
+    label="Color de la nota"
+    [colors]="colors"
+    [value]="target.color()"
+    (valueChange)="target.setColor($event)"
+  />
+</section>
+@if (note(); as n) {
+  <section class="section">
+    <label class="form-label" for="note-text">Comentario</label>
+    <textarea
+      id="note-text"
+      class="form-input form-input--textarea"
+      placeholder="Escribe un comentario…"
+      [value]="n.text"
+      (input)="onText($event)"
+      (keydown)="$event.stopPropagation()"
+    ></textarea>
+  </section>
+} @else {
+  <p class="form-hint">
+    Haz clic en la página para dejar un comentario. Se guarda como nota de PDF estándar, visible en
+    cualquier lector.
+  </p>
+}

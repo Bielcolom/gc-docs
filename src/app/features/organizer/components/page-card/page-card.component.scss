@@ -1,0 +1,170 @@
+@use 'breakpoints' as bp;
+@use 'mixins' as m;
+
+:host {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+  padding: 8px;
+  cursor: grab;
+  touch-action: manipulation;
+  border-radius: var(--radius-lg);
+
+  &:hover {
+    background: rgb(127 127 127 / 6%);
+  }
+}
+
+:host(.is-moving) {
+  opacity: 0.3;
+}
+
+.paper {
+  position: relative;
+  width: 100%;
+  background: #fff;
+  box-shadow:
+    0 0 0 1px var(--color-sheet-edge),
+    0 3px 10px -4px rgb(22 38 58 / 28%);
+  transition: box-shadow 0.12s;
+}
+
+:host(.is-selected) .paper {
+  box-shadow:
+    0 0 0 3px var(--color-selection),
+    0 8px 18px -8px rgb(22 38 58 / 45%);
+}
+
+.stripe {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 4px;
+  background: var(--source-color);
+}
+
+.meta {
+  display: flex;
+  gap: 6px;
+  align-items: baseline;
+  max-width: 100%;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-ink-2);
+}
+
+.number {
+  padding: 0 5px;
+  font-weight: 700;
+  color: var(--color-ink);
+  border-radius: 4px;
+}
+
+:host(.is-selected) .number {
+  color: #16263a;
+  background: var(--color-marker);
+}
+
+.source {
+  @include m.truncate;
+
+  color: var(--color-ink-3);
+}
+
+.check {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  color: transparent;
+  cursor: pointer;
+  background: #fff;
+  border: 1.5px solid #9aa5b1;
+  border-radius: 7px;
+  opacity: 0;
+  transition: opacity 0.12s;
+
+  &.is-on {
+    color: #fff;
+    background: var(--color-selection);
+    border-color: var(--color-selection);
+    opacity: 1;
+  }
+}
+
+.actions {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  opacity: 0;
+  transition: opacity 0.12s;
+}
+
+.actions button,
+.grip {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  color: var(--color-ink);
+  cursor: pointer;
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 12%);
+
+  &:hover {
+    background: var(--color-surface-2);
+  }
+}
+
+.actions .danger:hover {
+  color: var(--color-danger);
+}
+
+// Asa para arrastrar en pantallas táctiles (no impide desplazarse por la cuadrícula)
+.grip {
+  position: absolute;
+  right: 6px;
+  bottom: 8px;
+  display: none;
+  width: 30px;
+  height: 30px;
+  touch-action: none;
+  cursor: grab;
+}
+
+:host(:hover) .actions,
+:host(:hover) .check,
+:host(:focus-within) .actions,
+:host(:focus-within) .check {
+  opacity: 1;
+}
+
+:host-context(.is-dragging) .actions,
+:host-context(.is-dragging) .check:not(.is-on) {
+  opacity: 0 !important;
+}
+
+@include bp.no-hover {
+  .check {
+    opacity: 1;
+  }
+
+  .grip {
+    display: grid;
+  }
+
+  .actions {
+    display: none;
+  }
+}

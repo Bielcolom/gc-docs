@@ -1,0 +1,129 @@
+@use 'breakpoints' as bp;
+
+:host {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  align-items: center;
+  padding: 6px 8px 6px 14px;
+  margin: 12px 20px 0;
+  color: var(--color-inverse-ink);
+  background: var(--color-inverse);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-pop);
+  animation: drop-in 0.16s ease-out;
+
+  @include bp.down(sm) {
+    margin: 10px 10px 0;
+  }
+}
+
+@keyframes drop-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+
+.count {
+  padding-right: 4px;
+  font-size: 13px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.group {
+  display: flex;
+  gap: 2px;
+  align-items: center;
+
+  &--end {
+    margin-left: auto;
+  }
+}
+
+button {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 32px;
+  padding: 0 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: inherit;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  border-radius: 8px;
+
+  &:hover:not(:disabled) {
+    background: rgb(127 127 127 / 22%);
+  }
+
+  &.danger:hover {
+    color: #ff8a80;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-marker);
+    outline-offset: 1px;
+  }
+}
+
+.move-to {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  font-size: 13px;
+
+  label {
+    white-space: nowrap;
+    opacity: 0.8;
+  }
+
+  input {
+    width: 58px;
+    height: 30px;
+    padding: 0 8px;
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+    color: inherit;
+    background: rgb(127 127 127 / 22%);
+    border: 0;
+    border-radius: 7px;
+
+    &::placeholder {
+      color: inherit;
+      opacity: 0.55;
+    }
+
+    &:focus {
+      outline: 2px solid var(--color-marker);
+    }
+  }
+
+  &__submit {
+    font-weight: 700;
+    color: #16263a;
+    background: var(--color-marker);
+
+    &:hover:not(:disabled) {
+      background: var(--color-marker);
+    }
+
+    &:disabled {
+      cursor: default;
+      color: inherit;
+      background: rgb(127 127 127 / 22%);
+      opacity: 0.6;
+    }
+  }
+}
+
+.hide-md {
+  @include bp.down(lg) {
+    display: none;
+  }
+}

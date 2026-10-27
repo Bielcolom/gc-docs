@@ -1,0 +1,42 @@
+@use 'breakpoints' as bp;
+
+:host {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.scroller {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  user-select: none;
+}
+
+.grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(var(--column-width), 1fr));
+  gap: 22px 14px;
+  align-items: end;
+  padding: 20px 20px 80px;
+
+  &.is-dragging {
+    cursor: grabbing;
+  }
+
+  @include bp.down(sm) {
+    gap: 16px 8px;
+    padding: 14px 10px 80px;
+  }
+}
+
+.marquee {
+  position: absolute;
+  z-index: 6;
+  pointer-events: none;
+  background: rgb(42 111 219 / 10%);
+  border: 1.5px solid var(--color-selection);
+  border-radius: 3px;
+}

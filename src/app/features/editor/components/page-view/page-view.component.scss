@@ -1,0 +1,77 @@
+@use 'mixins' as m;
+
+:host {
+  position: relative;
+  display: block;
+}
+
+.sheet {
+  @include m.paper;
+
+  position: relative;
+  margin: 0 auto;
+  transition: box-shadow 0.2s;
+}
+
+:host(.is-current) .sheet {
+  @include m.paper($strong: true);
+}
+
+// La página se dibuja sin girar y se gira con CSS alrededor de su centro.
+.page {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  touch-action: none;
+  user-select: none;
+  transform-origin: center;
+}
+
+.canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.placeholder {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, transparent, rgb(22 38 58 / 5%), transparent) 0 0 / 40% 100% no-repeat,
+    #fff;
+  animation: shimmer 1.3s linear infinite;
+}
+
+@keyframes shimmer {
+  from {
+    background-position:
+      -40% 0,
+      0 0;
+  }
+
+  to {
+    background-position:
+      140% 0,
+      0 0;
+  }
+}
+
+.cover {
+  position: absolute;
+  pointer-events: none;
+}
+
+.search-hit {
+  position: absolute;
+  pointer-events: none;
+  background: rgb(255 196 0 / 35%);
+  border-radius: 2px;
+  mix-blend-mode: multiply;
+
+  &.is-active {
+    background: rgb(255 140 0 / 55%);
+    box-shadow: 0 0 0 2px #e07b00;
+  }
+}

@@ -1,0 +1,137 @@
+@if (selectionCount()) {
+  <div class="selection-bar" role="toolbar" aria-label="Acciones con las páginas seleccionadas">
+    <span>{{ selectionCount() | plural: 'seleccionada' : 'seleccionadas' }}</span>
+    <div class="selection-bar__actions">
+      <button
+        type="button"
+        title="Girar a la izquierda"
+        aria-label="Girar a la izquierda"
+        (click)="actions.rotate(-90)"
+      >
+        <app-icon name="rotateCcw" [size]="16" />
+      </button>
+      <button
+        type="button"
+        title="Girar a la derecha"
+        aria-label="Girar a la derecha"
+        (click)="actions.rotate(90)"
+      >
+        <app-icon name="rotateCw" [size]="16" />
+      </button>
+      <button type="button" title="Duplicar" aria-label="Duplicar" (click)="actions.duplicate()">
+        <app-icon name="copy" [size]="16" />
+      </button>
+      <button
+        type="button"
+        title="Descargar solo estas páginas"
+        aria-label="Descargar solo estas páginas"
+        (click)="actions.extract()"
+      >
+        <app-icon name="extract" [size]="16" />
+      </button>
+      <button
+        type="button"
+        class="danger"
+        title="Eliminar"
+        aria-label="Eliminar"
+        (click)="actions.delete()"
+      >
+        <app-icon name="trash" [size]="16" />
+      </button>
+      <button
+        type="button"
+        title="Quitar la selección"
+        aria-label="Quitar la selección"
+        (click)="editorStore.clearPageSelection()"
+      >
+        <app-icon name="close" [size]="16" />
+      </button>
+    </div>
+  </div>
+} @else {
+  <button type="button" class="organize-link" (click)="openOrganizer()">
+    <app-icon name="grid" [size]="16" />
+    <span
+      ><strong>Organizar páginas</strong
+      ><small>Vista en cuadrícula para mover muchas a la vez</small></span
+    >
+  </button>
+}
+
+<ol
+  class="list"
+  cdkDropList
+  [cdkDropListData]="documentStore.pages()"
+  (cdkDropListDropped)="onDrop($event)"
+  aria-label="Páginas del documento"
+>
+  @for (page of documentStore.pages(); track page.id; let i = $index) {
+    @let isSelected = selection().has(page.id);
+    <li
+      class="item"
+      cdkDrag
+      [cdkDragData]="page"
+      [class.is-current]="editorStore.currentPageIndex() === i"
+      [class.is-selected]="isSelected"
+      tabindex="0"
+      [attr.aria-label]="'Página ' + (i + 1)"
+      [attr.aria-current]="editorStore.currentPageIndex() === i ? 'page' : null"
+      (click)="onClick($event, page, i)"
+      (keydown.enter)="editorStore.requestScroll(i)"
+    >
+      <div class="item__paper">
+        <app-page-thumbnail [page]="page" />
+        @if (editedPageIds().has(page.id)) {
+          <span class="item__edited" title="Esta página tiene cambios"></span>
+        }
+        <button
+          type="button"
+          class="item__check"
+          [class.is-on]="isSelected"
+          [attr.aria-label]="isSelected ? 'Quitar de la selección' : 'Seleccionar'"
+          (click)="toggle($event, page)"
+        >
+          <app-icon name="check" [size]="12" [strokeWidth]="3" />
+        </button>
+        <div class="item__actions">
+          <button
+            type="button"
+            title="Girar a la izquierda"
+            aria-label="Girar a la izquierda"
+            (click)="rotate($event, page, -90)"
+          >
+            <app-icon name="rotateCcw" [size]="14" />
+          </button>
+          <button
+            type="button"
+            title="Girar a la derecha"
+            aria-label="Girar a la derecha"
+            (click)="rotate($event, page, 90)"
+          >
+            <app-icon name="rotateCw" [size]="14" />
+          </button>
+          <button
+            type="button"
+            class="danger"
+            title="Eliminar página"
+            aria-label="Eliminar página"
+            (click)="remove($event, page)"
+          >
+            <app-icon name="trash" [size]="14" />
+          </button>
+        </div>
+      </div>
+      <span class="item__number">{{ i + 1 }}</span>
+      <div class="item__placeholder" *cdkDragPlaceholder></div>
+    </li>
+  }
+</ol>
+
+<div class="footer">
+  <button type="button" class="add-button" (click)="actions.pickAndInsert()">
+    <app-icon name="filePlus" [size]="16" /> Añadir PDF o imágenes
+  </button>
+  <button type="button" class="add-button" (click)="actions.insertBlankPage()">
+    <app-icon name="file" [size]="16" /> Página en blanco
+  </button>
+</div>

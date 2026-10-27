@@ -1,0 +1,10 @@
+<header class="header">
+  <h2 class="title">{{ title() }}</h2>
+  <button type="button" class="btn btn--icon" aria-label="Cerrar" (click)="dialogRef.close()">
+    <app-icon name="close" />
+  </button>
+</header>
+<div class="content">
+  <ng-content />
+</div>
+<footer class="footer"><ng-content select="[dialogFooter]" /></footer>

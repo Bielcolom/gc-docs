@@ -1,0 +1,19 @@
+@if (editing()) {
+  <div
+    #editor
+    class="editor"
+    contenteditable="plaintext-only"
+    spellcheck="true"
+    role="textbox"
+    tabindex="0"
+    aria-multiline="true"
+    aria-label="Texto"
+    data-placeholder="Escribe aquí"
+    (input)="onInput()"
+    (keydown)="onKeydown($event)"
+    (blur)="onBlur()"
+    (pointerdown)="$event.stopPropagation()"
+  ></div>
+} @else {
+  <div class="text" [textContent]="annotation().text"></div>
+}

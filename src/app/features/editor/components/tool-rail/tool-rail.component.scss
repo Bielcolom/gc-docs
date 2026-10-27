@@ -1,0 +1,121 @@
+@use 'breakpoints' as bp;
+@use 'mixins' as m;
+
+:host {
+  position: relative;
+  z-index: 20;
+  display: block;
+}
+
+.rail {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  align-items: center;
+  height: 100%;
+  padding: 10px 7px;
+  background: var(--color-surface);
+  border-right: 1px solid var(--color-line);
+
+  @include bp.down(sm) {
+    flex-direction: row;
+    width: 100%;
+    height: auto;
+    padding: 6px 8px;
+    overflow-x: auto;
+    border-top: 1px solid var(--color-line);
+    border-right: 0;
+  }
+}
+
+.separator {
+  flex: none;
+  width: 24px;
+  height: 1px;
+  margin: 6px 0;
+  background: var(--color-line);
+
+  @include bp.down(sm) {
+    width: 1px;
+    height: 24px;
+    margin: 0 4px;
+  }
+}
+
+.tool {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 44px;
+  height: 42px;
+  color: var(--color-ink-2);
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  border-radius: 10px;
+
+  @include m.focus-ring(1px);
+
+  &:hover {
+    color: var(--color-ink);
+    background: var(--color-surface-2);
+  }
+
+  // La herramienta activa queda "marcada" con un trazo de rotulador fluorescente
+  &.is-active {
+    @include m.marker-swipe;
+
+    color: #16263a;
+    background: transparent;
+  }
+
+  &__corner {
+    position: absolute;
+    right: 5px;
+    bottom: 5px;
+    border-bottom: 4px solid currentcolor;
+    border-left: 4px solid transparent;
+    opacity: 0.6;
+  }
+
+  &__tip {
+    position: absolute;
+    top: 50%;
+    left: calc(100% + 10px);
+    z-index: 30;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    padding: 5px 9px;
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--color-tooltip-ink);
+    white-space: nowrap;
+    pointer-events: none;
+    background: var(--color-tooltip);
+    border-radius: 7px;
+    opacity: 0;
+    transform: translateY(-50%) translateX(-4px);
+    transition:
+      opacity 0.12s,
+      transform 0.12s;
+
+    kbd {
+      color: inherit;
+      background: rgb(255 255 255 / 16%);
+      border: 0;
+    }
+
+    @include bp.down(sm) {
+      display: none;
+    }
+  }
+
+  &:hover &__tip,
+  &:focus-visible &__tip {
+    opacity: 1;
+    transform: translateY(-50%);
+  }
+}

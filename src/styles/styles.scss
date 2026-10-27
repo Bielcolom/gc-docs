@@ -1,0 +1,6 @@
+// Punto de entrada de los estilos globales. Los estilos de cada componente viven junto a él.
+@use 'tokens';
+@use 'base';
+@use 'buttons';
+@use 'forms';
+@use 'cdk';

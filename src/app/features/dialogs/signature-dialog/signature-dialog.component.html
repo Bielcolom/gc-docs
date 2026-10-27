@@ -1,0 +1,136 @@
+<app-dialog-shell title="Firma" [wide]="true">
+  @if (storage.signatures().length) {
+    <section class="saved" aria-labelledby="saved-title">
+      <h3 id="saved-title" class="form-label">Tus firmas</h3>
+      <ul class="saved__list">
+        @for (signature of storage.signatures(); track signature.src) {
+          <li class="saved__item">
+            <button
+              type="button"
+              class="saved__use"
+              title="Usar esta firma"
+              (click)="reuse(signature)"
+            >
+              <img [src]="signature.src" alt="Firma guardada" />
+            </button>
+            <button
+              type="button"
+              class="saved__forget"
+              aria-label="Olvidar esta firma"
+              (click)="storage.forget(signature)"
+            >
+              ×
+            </button>
+          </li>
+        }
+      </ul>
+    </section>
+  }
+
+  <div class="segmented segmented--block tabs" role="tablist" aria-label="Tipo de firma">
+    <button
+      type="button"
+      role="tab"
+      class="segmented__option"
+      [class.is-active]="tab() === 'draw'"
+      [attr.aria-selected]="tab() === 'draw'"
+      (click)="tab.set('draw')"
+    >
+      Dibujar
+    </button>
+    <button
+      type="button"
+      role="tab"
+      class="segmented__option"
+      [class.is-active]="tab() === 'type'"
+      [attr.aria-selected]="tab() === 'type'"
+      (click)="tab.set('type')"
+    >
+      Escribir
+    </button>
+    <button
+      type="button"
+      role="tab"
+      class="segmented__option"
+      [class.is-active]="tab() === 'upload'"
+      [attr.aria-selected]="tab() === 'upload'"
+      (click)="tab.set('upload')"
+    >
+      Subir imagen
+    </button>
+  </div>
+
+  @switch (tab()) {
+    @case ('draw') {
+      <app-signature-pad [color]="ink()" />
+    }
+    @case ('type') {
+      <input
+        class="form-input"
+        type="text"
+        placeholder="Escribe tu nombre"
+        aria-label="Tu nombre"
+        [value]="typedName()"
+        (input)="onNameInput($event)"
+        appAutofocus
+      />
+      <div class="typed" role="radiogroup" aria-label="Estilo de letra">
+        @for (font of fonts; track font.id) {
+          <button
+            type="button"
+            role="radio"
+            class="typed__option"
+            [class.is-active]="typedFont() === font.id"
+            [attr.aria-checked]="typedFont() === font.id"
+            [style.font-family]="font.css"
+            [style.color]="ink()"
+            (click)="typedFont.set(font.id)"
+          >
+            {{ typedName() || 'Tu firma' }}
+          </button>
+        }
+      </div>
+    }
+    @case ('upload') {
+      @if (uploaded(); as image) {
+        <div class="upload-preview"><img [src]="image.src" alt="Imagen de la firma" /></div>
+        <label class="form-check upload-option">
+          <input
+            type="checkbox"
+            [checked]="removeBackground()"
+            (change)="onRemoveBackgroundChange($event)"
+          />
+          Quitar el fondo blanco
+        </label>
+        <button type="button" class="btn btn--sm" (click)="pickImage()">Elegir otra imagen</button>
+      } @else {
+        <button type="button" class="upload-drop" (click)="pickImage()">
+          <strong>Elige una foto o escaneo de tu firma</strong>
+          <small>PNG o JPG. Mejor sobre papel blanco.</small>
+        </button>
+      }
+    }
+  }
+
+  <ng-container dialogFooter>
+    @if (tab() !== 'upload') {
+      <div class="inks" role="radiogroup" aria-label="Color de la tinta">
+        @for (color of inks; track color) {
+          <button
+            type="button"
+            role="radio"
+            class="ink"
+            [class.is-active]="ink() === color"
+            [attr.aria-checked]="ink() === color"
+            [attr.aria-label]="'Tinta ' + color"
+            [style.background]="color"
+            (click)="ink.set(color)"
+          ></button>
+        }
+      </div>
+    }
+    <button type="button" class="btn btn--primary" [disabled]="!canPlace()" (click)="place()">
+      Colocar firma
+    </button>
+  </ng-container>
+</app-dialog-shell>

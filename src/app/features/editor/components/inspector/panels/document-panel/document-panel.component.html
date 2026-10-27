@@ -1,0 +1,54 @@
+<section class="section">
+  <h3 class="section__title">Página {{ pageNumber() }}</h3>
+  <div class="tiles">
+    <button type="button" class="btn" (click)="actions.rotate(-90)">
+      <app-icon name="rotateCcw" /> Girar izq.
+    </button>
+    <button type="button" class="btn" (click)="actions.rotate(90)">
+      <app-icon name="rotateCw" /> Girar der.
+    </button>
+    <button type="button" class="btn" (click)="actions.duplicate()">
+      <app-icon name="copy" /> Duplicar
+    </button>
+    <button type="button" class="btn btn--danger-hover" (click)="actions.delete()">
+      <app-icon name="trash" /> Eliminar
+    </button>
+    <button type="button" class="btn" (click)="actions.insertBlankPage()">
+      <app-icon name="file" /> Hoja en blanco
+    </button>
+    <button type="button" class="btn" (click)="actions.pickAndInsert(pageNumber())">
+      <app-icon name="filePlus" /> Insertar archivo
+    </button>
+  </div>
+</section>
+
+<ng-template #actionList let-items>
+  <ul class="actions">
+    @for (item of items; track item.title) {
+      <li>
+        <button type="button" class="action" (click)="item.run()">
+          <app-icon [name]="item.icon" />
+          <span>
+            <strong>{{ item.title }}</strong>
+            @if (item.description) {
+              <small>{{ item.description }}</small>
+            }
+          </span>
+        </button>
+      </li>
+    }
+  </ul>
+</ng-template>
+
+<section class="section">
+  <h3 class="section__title">Organizar</h3>
+  <ng-container *ngTemplateOutlet="actionList; context: { $implicit: organizeActions }" />
+</section>
+<section class="section">
+  <h3 class="section__title">Acabado</h3>
+  <ng-container *ngTemplateOutlet="actionList; context: { $implicit: finishActions() }" />
+</section>
+<section class="section">
+  <h3 class="section__title">Exportar</h3>
+  <ng-container *ngTemplateOutlet="actionList; context: { $implicit: exportActions }" />
+</section>

@@ -1,0 +1,17 @@
+<textarea
+  class="form-input form-input--textarea"
+  placeholder="Escribe un comentario…"
+  aria-label="Comentario"
+  [value]="note().text"
+  (input)="onInput($event)"
+  (keydown)="onKeydown($event)"
+  appAutofocus
+></textarea>
+<div class="actions">
+  <button type="button" class="btn btn--sm btn--ghost btn--danger" (click)="removeRequest.emit()">
+    Eliminar
+  </button>
+  <button type="button" class="btn btn--sm btn--primary" (click)="closeRequest.emit()">
+    Listo
+  </button>
+</div>

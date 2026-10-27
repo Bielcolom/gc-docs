@@ -1,0 +1,52 @@
+@use 'breakpoints' as bp;
+@use 'mixins' as m;
+
+:host {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 12px 20px 0;
+
+  @include bp.down(sm) {
+    margin: 10px 12px 0;
+  }
+}
+
+.chip {
+  display: inline-flex;
+  gap: 7px;
+  align-items: center;
+  max-width: 260px;
+  height: 30px;
+  padding: 0 10px;
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
+  border-radius: 99px;
+
+  @include m.focus-ring;
+
+  &:hover {
+    background: var(--color-surface-2);
+    border-color: var(--color-line-strong);
+  }
+
+  &__dot {
+    flex: none;
+    width: 9px;
+    height: 9px;
+    background: var(--source-color);
+    border-radius: 50%;
+  }
+
+  &__name {
+    @include m.truncate;
+  }
+
+  small {
+    font-variant-numeric: tabular-nums;
+    color: var(--color-ink-3);
+  }
+}

@@ -1,0 +1,11 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--color-surface);
+  border-right: 1px solid var(--color-line);
+}
+
+.tabs {
+  margin: 10px 10px 0;
+}

@@ -1,0 +1,13 @@
+<canvas
+  #canvas
+  class="canvas"
+  aria-label="Zona para dibujar la firma"
+  (pointerdown)="onPointerDown($event)"
+></canvas>
+<div class="baseline" aria-hidden="true"></div>
+@if (isEmpty()) {
+  <span class="hint">Firma aquí con el ratón, el dedo o un lápiz</span>
+}
+<button type="button" class="clear btn btn--sm" [disabled]="isEmpty()" (click)="clear()">
+  Borrar
+</button>

@@ -1,0 +1,179 @@
+@use 'breakpoints' as bp;
+@use 'mixins' as m;
+
+:host {
+  z-index: 30;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px 0 10px;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-line);
+
+  @include bp.down(sm) {
+    gap: 4px;
+    padding: 0 8px 0 4px;
+  }
+}
+
+.start,
+.middle,
+.end {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  min-width: 0;
+}
+
+.start {
+  flex: 1 1 0;
+}
+
+.end {
+  flex: 1 1 0;
+  justify-content: flex-end;
+
+  @include bp.down(sm) {
+    flex: none;
+  }
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  height: 38px;
+  padding: 0 10px 0 6px;
+  color: var(--color-ink);
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  border-radius: var(--radius-md);
+
+  @include m.focus-ring;
+
+  &:hover {
+    background: var(--color-surface-2);
+  }
+
+  @include bp.down(sm) {
+    padding: 0 4px;
+  }
+}
+
+.file {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  height: 34px;
+  padding: 0 10px;
+  margin-left: 4px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+
+  &:hover {
+    border-color: var(--color-line);
+  }
+
+  &:focus-within {
+    border-color: var(--color-ink);
+    box-shadow: 0 0 0 3px var(--color-focus-soft);
+  }
+
+  &__name {
+    min-width: 40px;
+    max-width: 280px;
+    field-sizing: content;
+    font-size: 14px;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    background: transparent;
+    border: 0;
+    outline: none;
+  }
+
+  &__ext {
+    font-size: 14px;
+    color: var(--color-ink-3);
+  }
+
+  &__dirty {
+    flex: none;
+    width: 7px;
+    height: 7px;
+    margin-left: 8px;
+    background: var(--color-marker-deep);
+    border-radius: 50%;
+  }
+
+  @include bp.down(sm) {
+    display: none;
+  }
+}
+
+.segmented {
+  margin-right: 8px;
+  text-decoration: none;
+
+  @include bp.down(sm) {
+    margin-right: 2px;
+  }
+}
+
+.segmented__option {
+  text-decoration: none;
+}
+
+.group {
+  display: flex;
+  gap: 2px;
+  align-items: center;
+
+  & + & {
+    padding-left: 8px;
+    margin-left: 4px;
+    border-left: 1px solid var(--color-line);
+  }
+}
+
+.zoom-value {
+  min-width: 58px;
+  height: 32px;
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  border-radius: 7px;
+
+  &:hover {
+    background: var(--color-surface-2);
+  }
+}
+
+.pager {
+  margin-left: 10px;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-ink-3);
+  white-space: nowrap;
+}
+
+.hide-md {
+  @include bp.down(lg) {
+    display: none;
+  }
+}
+
+.hide-sm {
+  @include bp.down(sm) {
+    display: none;
+  }
+}
+
+.hide-xs {
+  @include bp.down(xs) {
+    display: none;
+  }
+}

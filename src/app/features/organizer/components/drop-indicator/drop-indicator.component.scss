@@ -1,0 +1,30 @@
+:host {
+  position: absolute;
+  z-index: 5;
+  width: 4px;
+  margin-left: -2px;
+  pointer-events: none;
+  background: var(--color-marker-deep);
+  border-radius: 4px;
+  box-shadow: 0 0 0 3px rgb(255 225 77 / 35%);
+
+  &::before,
+  &::after {
+    position: absolute;
+    left: 50%;
+    width: 12px;
+    height: 12px;
+    margin-left: -6px;
+    content: '';
+    background: var(--color-marker-deep);
+    border-radius: 50%;
+  }
+
+  &::before {
+    top: -6px;
+  }
+
+  &::after {
+    bottom: -6px;
+  }
+}

@@ -1,0 +1,259 @@
+@use 'breakpoints' as bp;
+@use 'mixins' as m;
+
+:host {
+  display: block;
+  height: 100%;
+  overflow: auto;
+}
+
+.desk {
+  @include m.desk-background;
+
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 100%;
+  padding: 48px 24px;
+
+  @include bp.down(xs) {
+    padding: 20px 14px 40px;
+  }
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 520px) minmax(0, 300px);
+  gap: 56px;
+  align-items: center;
+
+  @include bp.down(md) {
+    grid-template-columns: minmax(0, 520px);
+    gap: 40px;
+  }
+}
+
+// La hoja de papel es el protagonista de la portada.
+.sheet {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  aspect-ratio: 1 / 1.3;
+  padding: 52px 52px 40px;
+  color: var(--color-paper-ink);
+  background: #fffefb;
+  border-radius: 2px;
+  box-shadow:
+    0 0 0 1px rgb(22 38 58 / 8%),
+    0 2px 4px rgb(22 38 58 / 6%),
+    0 24px 60px -24px rgb(22 38 58 / 45%);
+  transform: rotate(-1.2deg);
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+
+  &::before {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    content: '';
+    background: repeating-linear-gradient(
+      to bottom,
+      transparent 0 31px,
+      rgb(29 58 138 / 6%) 31px 32px
+    );
+  }
+
+  &.is-drop-target {
+    box-shadow:
+      0 0 0 3px var(--color-marker-deep),
+      0 30px 70px -24px rgb(22 38 58 / 50%);
+    transform: rotate(0) scale(1.015);
+  }
+
+  @include bp.down(md) {
+    aspect-ratio: auto;
+    min-height: 520px;
+  }
+
+  @include bp.down(xs) {
+    padding: 34px 26px 28px;
+    transform: none;
+  }
+
+  &__fold {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 46px;
+    height: 46px;
+    background: linear-gradient(225deg, var(--color-desk) 50%, #ece9df 50%);
+    box-shadow: -2px 2px 4px rgb(22 38 58 / 10%);
+  }
+
+  &__brand {
+    position: relative;
+  }
+
+  &__title {
+    position: relative;
+    margin: auto 0 18px;
+    font-family: var(--font-display);
+    font-size: clamp(34px, 4.4vw, 50px);
+    font-weight: 800;
+    line-height: 1.02;
+    text-wrap: balance;
+    letter-spacing: -0.035em;
+
+    @include bp.down(md) {
+      margin-top: 40px;
+    }
+  }
+
+  &__lede {
+    position: relative;
+    max-width: 40ch;
+    margin: 0 0 30px;
+    font-size: 16px;
+    line-height: 1.55;
+    color: #44515f;
+  }
+
+  &__cta {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: center;
+
+    .btn--primary {
+      color: #fffefb;
+      background: #16263a;
+
+      @include bp.down(xs) {
+        width: 100%;
+      }
+    }
+  }
+
+  &__or {
+    font-size: 14px;
+    color: #6b7785;
+  }
+
+  &__alternatives {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding-top: 28px;
+    margin-top: auto;
+
+    .btn {
+      color: #16263a;
+      background: transparent;
+      border-color: #dcd8cc;
+
+      &:hover {
+        background: #f4f1e8;
+      }
+    }
+  }
+
+  &__drop-hint {
+    position: absolute;
+    inset: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 700;
+    color: #16263a;
+    pointer-events: none;
+    background: rgb(255 225 77 / 18%);
+    border: 2px dashed var(--color-marker-deep);
+    border-radius: 4px;
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+
+  &.is-drop-target &__drop-hint {
+    opacity: 1;
+  }
+}
+
+// Notas al margen
+.notes {
+  &__title {
+    margin: 0 0 18px;
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 700;
+  }
+
+  &__list {
+    display: grid;
+    gap: 16px;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+
+  &__item {
+    position: relative;
+    display: grid;
+    gap: 2px;
+    padding-left: 18px;
+
+    &::before {
+      position: absolute;
+      top: 5px;
+      left: 0;
+      width: 8px;
+      height: 11px;
+      content: '';
+      background: var(--color-marker);
+      border-radius: 2px 4px 2px 5px;
+      transform: skewX(-8deg);
+    }
+
+    strong {
+      font-size: 14.5px;
+      font-weight: 600;
+    }
+
+    span {
+      font-size: 13.5px;
+      line-height: 1.45;
+      color: var(--color-ink-2);
+    }
+  }
+
+  &__privacy {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    padding-top: 16px;
+    margin: 28px 0 0;
+    font-size: 13px;
+    line-height: 1.45;
+    color: var(--color-ink-2);
+    border-top: 1px solid var(--color-line);
+  }
+}
+
+.theme-toggle {
+  position: fixed;
+  top: 14px;
+  right: 14px;
+  background: var(--color-surface);
+  box-shadow: 0 0 0 1px var(--color-line);
+
+  @include bp.down(sm) {
+    top: auto;
+    bottom: 14px;
+  }
+}

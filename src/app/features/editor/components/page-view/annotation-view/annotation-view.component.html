@@ -1,0 +1,129 @@
+@let a = annotation();
+@switch (a.type) {
+  @case ('rect') {
+    <svg class="svg" [attr.viewBox]="viewBox()" preserveAspectRatio="none" aria-hidden="true">
+      <rect
+        x="0"
+        y="0"
+        [attr.width]="a.w"
+        [attr.height]="a.h"
+        [attr.fill]="a.fill ?? 'none'"
+        [attr.stroke]="a.stroke ?? 'none'"
+        [attr.stroke-width]="a.stroke ? a.strokeWidth : 0"
+      />
+    </svg>
+  }
+  @case ('ellipse') {
+    <svg class="svg" [attr.viewBox]="viewBox()" preserveAspectRatio="none" aria-hidden="true">
+      <ellipse
+        [attr.cx]="a.w / 2"
+        [attr.cy]="a.h / 2"
+        [attr.rx]="a.w / 2"
+        [attr.ry]="a.h / 2"
+        [attr.fill]="a.fill ?? 'none'"
+        [attr.stroke]="a.stroke ?? 'none'"
+        [attr.stroke-width]="a.stroke ? a.strokeWidth : 0"
+      />
+    </svg>
+  }
+  @case ('ink') {
+    <svg class="svg" [attr.viewBox]="viewBox()" preserveAspectRatio="none" aria-hidden="true">
+      <path
+        [attr.d]="path()?.line"
+        fill="none"
+        [attr.stroke]="a.stroke"
+        [attr.stroke-width]="a.strokeWidth"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+  }
+  @case ('line') {
+    <svg class="svg" [attr.viewBox]="viewBox()" preserveAspectRatio="none" aria-hidden="true">
+      <path class="hit-area" [attr.d]="path()?.line" />
+      <path
+        [attr.d]="path()?.line"
+        fill="none"
+        [attr.stroke]="a.stroke"
+        [attr.stroke-width]="a.strokeWidth"
+        stroke-linecap="round"
+      />
+    </svg>
+  }
+  @case ('arrow') {
+    <svg class="svg" [attr.viewBox]="viewBox()" preserveAspectRatio="none" aria-hidden="true">
+      <path class="hit-area" [attr.d]="path()?.line" />
+      <path
+        [attr.d]="path()?.line"
+        fill="none"
+        [attr.stroke]="a.stroke"
+        [attr.stroke-width]="a.strokeWidth"
+        stroke-linecap="round"
+      />
+      <path [attr.d]="path()?.head" [attr.fill]="a.stroke" />
+    </svg>
+  }
+  @case ('highlight') {
+    <div
+      class="highlight"
+      [class]="'highlight highlight--' + a.mode"
+      [style.background]="a.color"
+      [style.--opacity]="a.opacity"
+    ></div>
+  }
+  @case ('image') {
+    <img class="image" [src]="a.src" [alt]="a.isSignature ? 'Firma' : 'Imagen'" draggable="false" />
+  }
+  @case ('note') {
+    <div class="note" [style.background]="a.color" [title]="a.text || 'Comentario'">
+      <app-icon name="note" [size]="14" [strokeWidth]="2" />
+    </div>
+  }
+  @case ('stamp') {
+    @if (stamp(); as s) {
+      <svg class="svg" [attr.viewBox]="viewBox()" preserveAspectRatio="none" aria-hidden="true">
+        <path
+          [attr.d]="s.frame"
+          fill="none"
+          [attr.stroke]="a.color"
+          [attr.stroke-width]="s.border"
+        />
+        <text
+          [attr.x]="a.w / 2"
+          [attr.y]="a.h / 2 + s.fontSize * 0.36"
+          text-anchor="middle"
+          font-family="Helvetica, Arial, sans-serif"
+          font-weight="700"
+          [attr.font-size]="s.fontSize"
+          [attr.fill]="a.color"
+        >
+          {{ a.label }}
+        </text>
+      </svg>
+    }
+  }
+  @case ('symbol') {
+    <svg class="svg" [attr.viewBox]="viewBox()" preserveAspectRatio="none" aria-hidden="true">
+      @if (a.kind === 'dot') {
+        <ellipse
+          [attr.cx]="a.w / 2"
+          [attr.cy]="a.h / 2"
+          [attr.rx]="a.w * 0.32"
+          [attr.ry]="a.h * 0.32"
+          [attr.fill]="a.color"
+        />
+      } @else {
+        @for (d of symbolPaths(); track $index) {
+          <path
+            [attr.d]="d"
+            fill="none"
+            [attr.stroke]="a.color"
+            [attr.stroke-width]="(a.w < a.h ? a.w : a.h) * 0.13"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        }
+      }
+    </svg>
+  }
+}

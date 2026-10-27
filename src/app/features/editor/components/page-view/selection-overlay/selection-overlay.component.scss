@@ -1,0 +1,87 @@
+@use 'mixins' as m;
+
+:host {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.frame {
+  position: absolute;
+  outline: 1.5px solid var(--color-selection);
+  outline-offset: 1px;
+}
+
+.handle {
+  position: absolute;
+  z-index: 3;
+  width: 11px;
+  height: 11px;
+  margin: -5.5px 0 0 -5.5px;
+  pointer-events: auto;
+  touch-action: none;
+  background: #fff;
+  border: 1.5px solid var(--color-selection);
+  border-radius: 3px;
+
+  &--nw,
+  &--se {
+    cursor: nwse-resize;
+  }
+
+  &--ne,
+  &--sw {
+    cursor: nesw-resize;
+  }
+
+  &--n,
+  &--s {
+    cursor: ns-resize;
+  }
+
+  &--e,
+  &--w {
+    cursor: ew-resize;
+  }
+
+  &--start,
+  &--end {
+    cursor: crosshair;
+    border-radius: 50%;
+  }
+}
+
+.toolbar {
+  @include m.popover;
+
+  position: absolute;
+  z-index: 4;
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  pointer-events: auto;
+  border-radius: var(--radius-md);
+  transform: translate(-100%, calc(-100% - 10px));
+
+  button {
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    color: var(--color-ink);
+    cursor: pointer;
+    background: transparent;
+    border: 0;
+    border-radius: var(--radius-sm);
+
+    @include m.focus-ring(1px);
+
+    &:hover {
+      background: var(--color-surface-2);
+    }
+
+    &.danger:hover {
+      color: var(--color-danger);
+    }
+  }
+}

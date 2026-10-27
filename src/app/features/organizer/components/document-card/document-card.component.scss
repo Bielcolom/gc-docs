@@ -1,0 +1,148 @@
+@use 'breakpoints' as bp;
+@use 'mixins' as m;
+
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 8px;
+  cursor: grab;
+  border-radius: var(--radius-lg);
+
+  &:hover {
+    background: rgb(127 127 127 / 6%);
+  }
+}
+
+:host(.is-moving) {
+  opacity: 0.3;
+}
+
+.cover {
+  position: relative;
+  padding-right: 12px;
+}
+
+.paper {
+  position: relative;
+  z-index: 2;
+  background: #fff;
+  box-shadow:
+    0 0 0 1px var(--color-sheet-edge),
+    0 3px 10px -4px rgb(22 38 58 / 28%);
+}
+
+.sheet {
+  position: absolute;
+  inset: 0 12px 0 0;
+  background: #fff;
+  box-shadow:
+    0 0 0 1px var(--color-sheet-edge),
+    0 3px 8px -4px rgb(22 38 58 / 25%);
+
+  &--middle {
+    z-index: 1;
+    transform: translate(6px, -6px);
+  }
+
+  &--back {
+    z-index: 0;
+    transform: translate(12px, -12px);
+  }
+}
+
+.stripe {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 4px;
+  background: var(--source-color);
+}
+
+.info {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  min-width: 0;
+
+  &__text {
+    display: grid;
+    min-width: 0;
+
+    strong {
+      @include m.truncate;
+
+      font-size: 13.5px;
+      font-weight: 600;
+    }
+
+    small {
+      font-size: 12px;
+      color: var(--color-ink-3);
+    }
+  }
+}
+
+.order {
+  display: grid;
+  flex: none;
+  place-items: center;
+  min-width: 26px;
+  height: 26px;
+  padding: 0 6px;
+  font-size: 13px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-inverse-ink);
+  background: var(--color-inverse);
+  border-radius: 8px;
+}
+
+.actions {
+  display: flex;
+  gap: 4px;
+}
+
+.actions button,
+.grip {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  color: var(--color-ink);
+  cursor: pointer;
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 12%);
+
+  &:hover:not(:disabled) {
+    background: var(--color-surface-2);
+  }
+
+  &:disabled {
+    cursor: default;
+    opacity: 0.35;
+  }
+
+  &.danger:hover {
+    color: var(--color-danger);
+  }
+}
+
+.grip {
+  position: absolute;
+  right: 6px;
+  bottom: 8px;
+  display: none;
+  width: 30px;
+  height: 30px;
+  touch-action: none;
+}
+
+@include bp.no-hover {
+  .grip {
+    display: grid;
+  }
+}

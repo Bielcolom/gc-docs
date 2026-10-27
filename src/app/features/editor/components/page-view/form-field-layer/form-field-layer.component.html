@@ -1,0 +1,68 @@
+@for (field of fields.value() ?? []; track field.id) {
+  @let current = value(field);
+  <div
+    class="field"
+    [style.left.px]="field.x * zoom()"
+    [style.top.px]="field.y * zoom()"
+    [style.width.px]="field.w * zoom()"
+    [style.height.px]="field.h * zoom()"
+    (pointerdown)="$event.stopPropagation()"
+  >
+    @switch (field.kind) {
+      @case ('text') {
+        @if (field.multiline) {
+          <textarea
+            [value]="current"
+            [readOnly]="field.readOnly"
+            [style.font-size.px]="fontSize(field)"
+            [attr.aria-label]="field.name"
+            (input)="setText(field, $event)"
+          ></textarea>
+        } @else {
+          <input
+            type="text"
+            [value]="current"
+            [readOnly]="field.readOnly"
+            [style.font-size.px]="fontSize(field)"
+            [attr.aria-label]="field.name"
+            (input)="setText(field, $event)"
+          />
+        }
+      }
+      @case ('checkbox') {
+        <input
+          type="checkbox"
+          [checked]="current === true"
+          [disabled]="field.readOnly"
+          [attr.aria-label]="field.name"
+          (change)="setChecked(field, $event)"
+        />
+      }
+      @case ('radio') {
+        <input
+          type="radio"
+          [name]="page().id + field.name"
+          [checked]="current === field.exportValue"
+          [disabled]="field.readOnly"
+          [attr.aria-label]="field.name + ' ' + field.exportValue"
+          (change)="update(field, field.exportValue)"
+        />
+      }
+      @case ('select') {
+        <select
+          [disabled]="field.readOnly"
+          [style.font-size.px]="fontSize(field)"
+          [attr.aria-label]="field.name"
+          (change)="setText(field, $event)"
+        >
+          <option value=""></option>
+          @for (option of field.options; track option.value) {
+            <option [value]="option.value" [selected]="current === option.value">
+              {{ option.label }}
+            </option>
+          }
+        </select>
+      }
+    }
+  </div>
+}

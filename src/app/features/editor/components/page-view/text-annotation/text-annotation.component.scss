@@ -1,0 +1,37 @@
+:host {
+  position: absolute;
+  min-width: 4px;
+  min-height: 1em;
+  line-height: 1.2;
+  pointer-events: none;
+}
+
+:host(.is-interactive) {
+  pointer-events: auto;
+  cursor: move;
+}
+
+:host(.is-editing) {
+  pointer-events: auto;
+  cursor: text;
+  outline: 1.5px solid var(--color-selection);
+  outline-offset: 2px;
+}
+
+.text,
+.editor {
+  min-height: 1.2em;
+  white-space: pre;
+}
+
+.editor {
+  min-width: 2px;
+  caret-color: currentcolor;
+  outline: none;
+  user-select: text;
+
+  &:empty::before {
+    content: attr(data-placeholder);
+    opacity: 0.4;
+  }
+}

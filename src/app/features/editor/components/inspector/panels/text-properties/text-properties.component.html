@@ -1,0 +1,157 @@
+<section class="section">
+  <label class="form-label" for="font">Fuente</label>
+  <select id="font" class="form-input" [value]="target.font()" (change)="onFontChange($event)">
+    @for (group of fontGroups; track group.label) {
+      <optgroup [label]="group.label">
+        @for (font of group.fonts; track font.id) {
+          <option [value]="font.id" [selected]="target.font() === font.id">{{ font.label }}</option>
+        }
+      </optgroup>
+    }
+  </select>
+</section>
+
+<section class="section split">
+  <div>
+    <label class="form-label" for="size">Tamaño</label>
+    <div class="stepper">
+      <button type="button" aria-label="Reducir tamaño" (click)="target.setSize(target.size() - 1)">
+        <app-icon name="minus" [size]="14" />
+      </button>
+      <input
+        id="size"
+        type="number"
+        min="4"
+        max="300"
+        step="0.5"
+        [value]="target.size()"
+        (change)="onSizeChange($event)"
+      />
+      <button
+        type="button"
+        aria-label="Aumentar tamaño"
+        (click)="target.setSize(target.size() + 1)"
+      >
+        <app-icon name="plus" [size]="14" />
+      </button>
+    </div>
+  </div>
+  <div>
+    <span class="form-label">Estilo</span>
+    <div class="segmented">
+      <button
+        type="button"
+        class="segmented__option"
+        title="Negrita (Ctrl+B)"
+        aria-label="Negrita"
+        [class.is-active]="target.bold()"
+        [attr.aria-pressed]="target.bold()"
+        (click)="target.toggle('bold')"
+      >
+        <app-icon name="bold" [size]="15" [strokeWidth]="2.2" />
+      </button>
+      <button
+        type="button"
+        class="segmented__option"
+        title="Cursiva (Ctrl+I)"
+        aria-label="Cursiva"
+        [class.is-active]="target.italic()"
+        [attr.aria-pressed]="target.italic()"
+        (click)="target.toggle('italic')"
+      >
+        <app-icon name="italic" [size]="15" />
+      </button>
+      @if (text()) {
+        <button
+          type="button"
+          class="segmented__option"
+          title="Subrayado (Ctrl+U)"
+          aria-label="Subrayado"
+          [class.is-active]="target.underline()"
+          [attr.aria-pressed]="target.underline()"
+          (click)="target.toggle('underline')"
+        >
+          <app-icon name="underline" [size]="15" />
+        </button>
+      }
+    </div>
+  </div>
+</section>
+
+@if (text(); as t) {
+  <section class="section">
+    <span class="form-label">Alineación</span>
+    <div class="segmented segmented--block" role="radiogroup" aria-label="Alineación">
+      <button
+        type="button"
+        role="radio"
+        class="segmented__option"
+        aria-label="Izquierda"
+        [class.is-active]="t.align === 'left'"
+        [attr.aria-checked]="t.align === 'left'"
+        (click)="target.setAlign('left')"
+      >
+        <app-icon name="alignLeft" [size]="15" />
+      </button>
+      <button
+        type="button"
+        role="radio"
+        class="segmented__option"
+        aria-label="Centro"
+        [class.is-active]="t.align === 'center'"
+        [attr.aria-checked]="t.align === 'center'"
+        (click)="target.setAlign('center')"
+      >
+        <app-icon name="alignCenter" [size]="15" />
+      </button>
+      <button
+        type="button"
+        role="radio"
+        class="segmented__option"
+        aria-label="Derecha"
+        [class.is-active]="t.align === 'right'"
+        [attr.aria-checked]="t.align === 'right'"
+        (click)="target.setAlign('right')"
+      >
+        <app-icon name="alignRight" [size]="15" />
+      </button>
+    </div>
+  </section>
+}
+
+<section class="section">
+  <span class="form-label">Color</span>
+  <app-color-swatches
+    label="Color del texto"
+    [colors]="palette"
+    [value]="target.color()"
+    (valueChange)="target.setColor($event)"
+  />
+</section>
+
+@if (text(); as t) {
+  <section class="section">
+    <span class="form-label">Fondo de la caja</span>
+    <app-color-swatches
+      label="Fondo de la caja"
+      [colors]="palette"
+      [value]="t.background"
+      [allowNone]="true"
+      (valueChange)="target.setBackground($event)"
+    />
+  </section>
+  @if (t.cover) {
+    <section class="section card">
+      <span class="form-label">Color que tapa el texto original</span>
+      <app-color-swatches
+        label="Color que tapa el texto original"
+        [colors]="coverColors"
+        [value]="t.cover.color"
+        (valueChange)="target.setCoverColor($event)"
+      />
+      <button type="button" class="link-button" (click)="restoreOriginal()">
+        <app-icon name="undo" [size]="14" /> Restaurar el texto original
+      </button>
+    </section>
+  }
+}

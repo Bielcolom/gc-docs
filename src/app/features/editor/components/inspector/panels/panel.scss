@@ -1,0 +1,83 @@
+// Estilos comunes a los paneles del inspector.
+:host {
+  display: block;
+}
+
+.section {
+  padding: 12px 0;
+
+  & + & {
+    border-top: 1px solid var(--color-line-soft);
+  }
+}
+
+.split {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+}
+
+.stepper {
+  display: flex;
+  height: 34px;
+  overflow: hidden;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-line-strong);
+  border-radius: 8px;
+
+  button {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    color: var(--color-ink-2);
+    cursor: pointer;
+    background: transparent;
+    border: 0;
+
+    &:hover {
+      color: var(--color-ink);
+      background: var(--color-line-soft);
+    }
+  }
+
+  input {
+    width: 100%;
+    min-width: 0;
+    font-size: 13.5px;
+    font-variant-numeric: tabular-nums;
+    text-align: center;
+    appearance: textfield;
+    background: transparent;
+    border: 0;
+    border-right: 1px solid var(--color-line);
+    border-left: 1px solid var(--color-line);
+
+    &::-webkit-inner-spin-button {
+      appearance: none;
+    }
+  }
+}
+
+.card {
+  padding: 12px;
+  margin-top: 4px;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-line);
+  border-radius: 10px;
+}
+
+.link-button {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  padding: 0;
+  margin-top: 12px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--color-ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+  background: none;
+  border: 0;
+}

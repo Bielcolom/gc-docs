@@ -1,0 +1,90 @@
+<span class="count">{{ count() | plural: 'página' : 'páginas' }}</span>
+
+<div class="group">
+  <button
+    type="button"
+    title="Mover una posición antes (Alt ←)"
+    aria-label="Mover una posición antes"
+    (click)="shift(-1)"
+  >
+    <app-icon name="arrowLeft" [size]="16" />
+  </button>
+  <button
+    type="button"
+    title="Mover una posición después (Alt →)"
+    aria-label="Mover una posición después"
+    (click)="shift(1)"
+  >
+    <app-icon name="arrowRight" [size]="16" />
+  </button>
+  <button type="button" title="Mover al principio" (click)="toStart()">
+    <app-icon name="toStart" [size]="16" /> <span class="hide-md">Al principio</span>
+  </button>
+  <button type="button" title="Mover al final" (click)="toEnd()">
+    <app-icon name="toEnd" [size]="16" /> <span class="hide-md">Al final</span>
+  </button>
+</div>
+
+<form class="move-to" [formGroup]="moveForm" (ngSubmit)="moveToPosition()">
+  <label for="move-to">Mover a la posición</label>
+  <input
+    id="move-to"
+    type="number"
+    min="1"
+    [max]="maxPosition()"
+    placeholder="nº"
+    formControlName="position"
+  />
+  <button type="submit" class="move-to__submit" [disabled]="moveForm.invalid">Mover</button>
+</form>
+
+<div class="group">
+  <button
+    type="button"
+    title="Girar a la izquierda (⇧ R)"
+    aria-label="Girar a la izquierda"
+    (click)="actions.rotate(-90)"
+  >
+    <app-icon name="rotateCcw" [size]="16" />
+  </button>
+  <button
+    type="button"
+    title="Girar a la derecha (R)"
+    aria-label="Girar a la derecha"
+    (click)="actions.rotate(90)"
+  >
+    <app-icon name="rotateCw" [size]="16" />
+  </button>
+  <button type="button" title="Duplicar (Ctrl D)" aria-label="Duplicar" (click)="duplicate()">
+    <app-icon name="copy" [size]="16" />
+  </button>
+  <button
+    type="button"
+    title="Descargar estas páginas en un PDF aparte"
+    aria-label="Descargar estas páginas en un PDF aparte"
+    (click)="actions.extract()"
+  >
+    <app-icon name="extract" [size]="16" />
+  </button>
+  <button
+    type="button"
+    class="danger"
+    title="Eliminar (Supr)"
+    aria-label="Eliminar"
+    (click)="remove()"
+  >
+    <app-icon name="trash" [size]="16" />
+  </button>
+</div>
+
+<div class="group group--end">
+  <button type="button" (click)="selectAll()">Todas</button>
+  <button
+    type="button"
+    title="Quitar la selección (Esc)"
+    aria-label="Quitar la selección"
+    (click)="editorStore.clearPageSelection()"
+  >
+    <app-icon name="close" [size]="16" />
+  </button>
+</div>

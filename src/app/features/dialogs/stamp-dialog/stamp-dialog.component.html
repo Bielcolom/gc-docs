@@ -1,0 +1,30 @@
+<app-dialog-shell title="Sellos">
+  <div class="presets">
+    @for (stamp of presets; track stamp.label) {
+      <button type="button" class="stamp" [style.--stamp]="stamp.color" (click)="choose(stamp)">
+        {{ stamp.label }}
+      </button>
+    }
+  </div>
+
+  <form class="custom" [formGroup]="form" (ngSubmit)="submitCustom()">
+    <label class="form-label" for="stamp-label">Sello propio</label>
+    <div class="custom__row">
+      <input
+        id="stamp-label"
+        class="form-input"
+        type="text"
+        placeholder="Ej.: FACTURADO"
+        formControlName="label"
+        [attr.maxlength]="maxLength"
+      />
+      <button type="submit" class="btn btn--primary" [disabled]="form.invalid">Colocar</button>
+    </div>
+    <app-color-swatches
+      label="Color del sello"
+      [colors]="colors"
+      [value]="form.controls.color.value"
+      (valueChange)="form.controls.color.setValue($event ?? colors[0])"
+    />
+  </form>
+</app-dialog-shell>

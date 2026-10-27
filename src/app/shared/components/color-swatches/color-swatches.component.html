@@ -1,0 +1,43 @@
+<div class="swatches" role="radiogroup" [attr.aria-label]="label()">
+  @if (allowNone()) {
+    <button
+      type="button"
+      class="swatch swatch--none"
+      role="radio"
+      title="Sin color"
+      aria-label="Sin color"
+      [class.is-active]="normalized() === null"
+      [attr.aria-checked]="normalized() === null"
+      (click)="valueChange.emit(null)"
+    >
+      <app-icon name="close" [size]="13" />
+    </button>
+  }
+  @for (color of colors(); track color) {
+    <button
+      type="button"
+      class="swatch"
+      role="radio"
+      [class.swatch--light]="color === '#ffffff'"
+      [class.is-active]="normalized() === color"
+      [style.--swatch]="color"
+      [title]="color"
+      [attr.aria-label]="color"
+      [attr.aria-checked]="normalized() === color"
+      (click)="valueChange.emit(color)"
+    ></button>
+  }
+  <label
+    class="swatch swatch--custom"
+    title="Otro color"
+    [class.is-active]="isCustom()"
+    [style.--swatch]="value() ?? '#ffffff'"
+  >
+    <input
+      type="color"
+      [value]="value() ?? '#000000'"
+      (input)="onCustomInput($event)"
+      aria-label="Elegir otro color"
+    />
+  </label>
+</div>

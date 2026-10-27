@@ -1,0 +1,71 @@
+@let annotation = target.annotation();
+@let panel = target.panel();
+
+<header class="header">
+  <div>
+    <h2 class="header__title">{{ title() }}</h2>
+    <p class="header__subtitle">
+      @if (annotation) {
+        Página {{ pageNumber() }}
+      } @else if (panel) {
+        Estilo para lo próximo que añadas
+      } @else {
+        {{ documentStore.pageCount() | plural: 'página' : 'páginas' }} ·
+        {{ documentStore.annotations().length | plural: 'cambio' : 'cambios' }}
+      }
+    </p>
+  </div>
+  @if (annotation) {
+    <button
+      type="button"
+      class="btn btn--icon"
+      title="Deseleccionar (Esc)"
+      aria-label="Deseleccionar"
+      (click)="editorStore.selectAnnotation(null)"
+    >
+      <app-icon name="close" [size]="16" />
+    </button>
+  }
+</header>
+
+<div class="body">
+  @switch (panel) {
+    @case ('text') {
+      <app-text-properties />
+    }
+    @case ('shape') {
+      <app-shape-properties />
+    }
+    @case ('stroke') {
+      <app-stroke-properties />
+    }
+    @case ('highlight') {
+      <app-highlight-properties />
+    }
+    @case ('note') {
+      <app-note-properties />
+    }
+    @case ('stamp') {
+      <app-stamp-properties />
+    }
+    @case ('symbol') {
+      <app-symbol-properties />
+    }
+    @case ('edit-text-hint') {
+      <app-tool-hint tool="edit-text" />
+    }
+    @case ('whiteout-hint') {
+      <app-tool-hint tool="whiteout" />
+    }
+    @case (null) {
+      <app-document-panel />
+    }
+  }
+
+  @if (showOpacity()) {
+    <app-opacity-field />
+  }
+  @if (annotation) {
+    <app-annotation-actions [annotation]="annotation" />
+  }
+</div>

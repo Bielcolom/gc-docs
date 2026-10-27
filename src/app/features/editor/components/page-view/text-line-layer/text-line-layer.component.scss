@@ -1,0 +1,23 @@
+:host {
+  position: absolute;
+  inset: 0;
+}
+
+.line {
+  position: absolute;
+  padding: 0;
+  cursor: text;
+  background: transparent;
+  border: 0;
+  border-radius: 2px;
+  outline: 1px dashed rgb(42 111 219 / 35%);
+  transition:
+    background 0.12s,
+    outline-color 0.12s;
+
+  &:hover,
+  &:focus-visible {
+    background: rgb(255 225 77 / 28%);
+    outline: 1.5px solid var(--color-marker-deep);
+  }
+}

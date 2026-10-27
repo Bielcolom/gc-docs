@@ -1,0 +1,7 @@
+<div class="hint">
+  <app-icon [name]="hint().icon" [size]="22" />
+  <p>{{ hint().text }}</p>
+</div>
+@if (hint().detail; as detail) {
+  <p class="form-hint">{{ detail }}</p>
+}

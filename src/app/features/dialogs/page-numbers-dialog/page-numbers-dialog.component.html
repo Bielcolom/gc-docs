@@ -1,0 +1,68 @@
+<app-dialog-shell title="Numerar páginas">
+  <form [formGroup]="form" class="settings">
+    <label class="switch">
+      <input type="checkbox" formControlName="enabled" />
+      <span class="switch__track"></span>
+      Numerar las páginas
+    </label>
+
+    <fieldset class="settings__fields" [disabled]="!form.controls.enabled.value">
+      <div role="radiogroup" aria-labelledby="pn-format-label">
+        <span id="pn-format-label" class="form-label">Formato</span>
+        <div class="chips">
+          @for (option of formats; track option.format) {
+            <label class="chip">
+              <input type="radio" formControlName="format" [value]="option.format" />
+              <span>{{ option.example }}</span>
+            </label>
+          }
+        </div>
+      </div>
+
+      <div role="radiogroup" aria-labelledby="pn-position-label">
+        <span id="pn-position-label" class="form-label">Posición</span>
+        <div class="position-picker">
+          @for (position of positions; track position.id) {
+            <label class="position-picker__slot" [title]="position.label">
+              <input
+                type="radio"
+                formControlName="position"
+                [value]="position.id"
+                [attr.aria-label]="position.label"
+              />
+              <span aria-hidden="true"></span>
+            </label>
+          }
+        </div>
+      </div>
+
+      <div class="settings__row">
+        <div>
+          <label class="form-label" for="pn-size"
+            >Tamaño <output>{{ form.controls.size.value }} pt</output></label
+          >
+          <input
+            id="pn-size"
+            class="form-range"
+            type="range"
+            min="6"
+            max="24"
+            formControlName="size"
+          />
+        </div>
+        <div>
+          <label class="form-label" for="pn-start">Empezar en</label>
+          <input id="pn-start" class="form-input" type="number" min="0" formControlName="startAt" />
+        </div>
+      </div>
+
+      <label class="form-check">
+        <input type="checkbox" formControlName="skipFirst" />
+        No numerar la portada (primera página)
+      </label>
+    </fieldset>
+  </form>
+  <ng-container dialogFooter>
+    <button type="button" class="btn btn--primary" (click)="dialogRef.close()">Hecho</button>
+  </ng-container>
+</app-dialog-shell>

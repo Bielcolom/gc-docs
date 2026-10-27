@@ -1,0 +1,5 @@
+<div class="toasts" role="status" aria-live="polite">
+  @for (toast of notifications.notifications(); track toast.id) {
+    <div class="toast" [class]="'toast toast--' + toast.kind">{{ toast.message }}</div>
+  }
+</div>

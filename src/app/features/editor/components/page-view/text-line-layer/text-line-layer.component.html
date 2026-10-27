@@ -1,0 +1,15 @@
+@for (line of lines.value() ?? []; track line.key) {
+  @if (!editedKeys().has(line.key)) {
+    <button
+      type="button"
+      class="line"
+      [style.left.px]="(line.x - 1) * zoom()"
+      [style.top.px]="(line.y - 1) * zoom()"
+      [style.width.px]="(line.width + 2) * zoom()"
+      [style.height.px]="(line.height + 2) * zoom()"
+      [attr.aria-label]="'Editar: ' + line.text"
+      title="Haz clic para editar este texto"
+      (pointerdown)="select(line, $event)"
+    ></button>
+  }
+}

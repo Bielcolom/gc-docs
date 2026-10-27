@@ -1,0 +1,52 @@
+<app-dialog-shell title="Dividir el documento">
+  <form id="split-form" class="choices" [formGroup]="form" (ngSubmit)="submit()">
+    <label class="choices__option">
+      <input type="radio" formControlName="mode" value="every" />
+      <span class="choices__body">
+        <strong>Cada cierto número de páginas</strong>
+        <span class="inline">
+          Un archivo cada
+          <input
+            class="form-input form-input--number"
+            type="number"
+            min="1"
+            [max]="total()"
+            formControlName="every"
+            aria-label="Páginas por archivo"
+          />
+          páginas
+        </span>
+      </span>
+    </label>
+    <label class="choices__option">
+      <input type="radio" formControlName="mode" value="ranges" />
+      <span class="choices__body">
+        <strong>Por rangos</strong>
+        <input
+          class="form-input"
+          type="text"
+          placeholder="1-3, 4, 5-8"
+          formControlName="ranges"
+          aria-label="Rangos de páginas"
+        />
+        <small>Separa los rangos con comas. Cada rango será un PDF.</small>
+      </span>
+    </label>
+    <label class="choices__option">
+      <input type="radio" formControlName="mode" value="single" />
+      <span class="choices__body"><strong>Una página por archivo</strong></span>
+    </label>
+  </form>
+  <ng-container dialogFooter>
+    <span class="summary">
+      @if (groups(); as list) {
+        Se crearán {{ list.length | plural: 'archivo' : 'archivos' }} en un ZIP
+      } @else {
+        <span class="form-error">Revisa los rangos: hay páginas del 1 al {{ total() }}</span>
+      }
+    </span>
+    <button type="submit" form="split-form" class="btn btn--primary" [disabled]="!groups()?.length">
+      Dividir y descargar
+    </button>
+  </ng-container>
+</app-dialog-shell>

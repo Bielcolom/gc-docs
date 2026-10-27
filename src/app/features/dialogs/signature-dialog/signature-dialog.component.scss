@@ -1,0 +1,144 @@
+.saved {
+  margin-bottom: 16px;
+
+  &__list {
+    display: flex;
+    gap: 8px;
+    padding: 6px 6px 4px 0;
+    margin: 0;
+    overflow-x: auto;
+    list-style: none;
+  }
+
+  &__item {
+    position: relative;
+    flex: none;
+  }
+
+  &__use {
+    width: 120px;
+    height: 56px;
+    padding: 6px;
+    cursor: pointer;
+    background: #fff;
+    border: 1px solid var(--color-line);
+    border-radius: 10px;
+
+    &:hover {
+      border-color: var(--color-ink);
+    }
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+  }
+
+  &__forget {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    display: grid;
+    place-items: center;
+    width: 20px;
+    height: 20px;
+    font-size: 14px;
+    line-height: 1;
+    color: var(--color-ink-2);
+    cursor: pointer;
+    background: var(--color-surface);
+    border: 1px solid var(--color-line);
+    border-radius: 50%;
+  }
+}
+
+.tabs {
+  margin-bottom: 14px;
+}
+
+.typed {
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+
+  &__option {
+    height: 64px;
+    padding: 0 16px;
+    overflow: hidden;
+    font-size: 34px;
+    text-align: left;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    cursor: pointer;
+    background: #fff;
+    border: 1px solid var(--color-line);
+    border-radius: 10px;
+
+    &.is-active {
+      border-color: var(--color-ink);
+      box-shadow: 0 0 0 2px var(--color-ink);
+    }
+  }
+}
+
+.upload-drop {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 200px;
+  cursor: pointer;
+  background: var(--color-surface-2);
+  border: 1.5px dashed var(--color-line-strong);
+  border-radius: var(--radius-lg);
+
+  &:hover {
+    border-color: var(--color-ink);
+  }
+
+  small {
+    color: var(--color-ink-3);
+  }
+}
+
+.upload-preview {
+  display: grid;
+  place-items: center;
+  height: 160px;
+  padding: 12px;
+  background: repeating-conic-gradient(#f0f2f4 0 25%, #fff 0 50%) 0 0 / 16px 16px;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-lg);
+
+  img {
+    max-width: 100%;
+    max-height: 100%;
+  }
+}
+
+.upload-option {
+  margin: 12px 0 8px;
+}
+
+.inks {
+  display: flex;
+  gap: 8px;
+  margin-right: auto;
+}
+
+.ink {
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  border: 0;
+  border-radius: 50%;
+
+  &.is-active {
+    box-shadow:
+      0 0 0 2px var(--color-surface),
+      0 0 0 4px var(--color-ink);
+  }
+}

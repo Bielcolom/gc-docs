@@ -1,0 +1,94 @@
+// Estilos compartidos por los diálogos de ajustes (marca de agua, numeración, propiedades…).
+.settings {
+  display: grid;
+  gap: 16px;
+
+  &__fields {
+    display: grid;
+    gap: 16px;
+    min-width: 0;
+    padding: 0;
+    margin: 0;
+    border: 0;
+    transition: opacity 0.15s;
+
+    &:disabled {
+      opacity: 0.45;
+    }
+  }
+
+  &__row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .form-hint {
+    margin: 0;
+  }
+}
+
+.choices {
+  display: grid;
+  gap: 8px;
+
+  &__option {
+    display: flex;
+    gap: 12px;
+    padding: 12px;
+    color: var(--color-ink);
+    cursor: pointer;
+    border: 1px solid var(--color-line);
+    border-radius: 11px;
+
+    &:has(input:checked) {
+      border-color: var(--color-ink);
+      box-shadow: 0 0 0 1px var(--color-ink);
+    }
+
+    > input {
+      margin-top: 2px;
+      accent-color: var(--color-ink);
+    }
+  }
+
+  &__body {
+    display: grid;
+    flex: 1;
+    gap: 6px;
+
+    strong {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    small {
+      font-size: 12.5px;
+      color: var(--color-ink-3);
+    }
+  }
+}
+
+.inline {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-size: 13px;
+  color: var(--color-ink-2);
+}
+
+.form-input--number {
+  width: 64px;
+  height: 30px;
+  text-align: center;
+}
+
+.summary {
+  margin-right: auto;
+  font-size: 12.5px;
+  color: var(--color-ink-3);
+
+  .form-error {
+    margin: 0;
+  }
+}

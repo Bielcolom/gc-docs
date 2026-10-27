@@ -1,0 +1,41 @@
+:host {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.field {
+  position: absolute;
+  display: flex;
+  pointer-events: auto;
+
+  input[type='text'],
+  textarea,
+  select {
+    width: 100%;
+    height: 100%;
+    padding: 0 2px;
+    margin: 0;
+    font-family: Helvetica, Arial, sans-serif;
+    color: #111;
+    resize: none;
+    background: rgb(64 120 255 / 10%);
+    border: 0;
+    border-radius: 1px;
+    outline: none;
+
+    &:focus {
+      background: rgb(64 120 255 / 16%);
+      box-shadow: 0 0 0 1.5px #2a6fdb;
+    }
+  }
+
+  input[type='checkbox'],
+  input[type='radio'] {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    cursor: pointer;
+    accent-color: #16263a;
+  }
+}

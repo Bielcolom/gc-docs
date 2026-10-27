@@ -1,0 +1,99 @@
+@let documentsMode = mode() === 'documents';
+<header class="toolbar">
+  <div class="toolbar__start">
+    <div class="segmented" role="tablist" aria-label="Organizar por">
+      <button
+        type="button"
+        role="tab"
+        class="segmented__option"
+        [class.is-active]="!documentsMode"
+        [attr.aria-selected]="!documentsMode"
+        (click)="mode.set('pages')"
+      >
+        <app-icon name="grid" [size]="16" /> Páginas
+        <span class="badge">{{ documentStore.pageCount() }}</span>
+      </button>
+      <button
+        type="button"
+        role="tab"
+        class="segmented__option"
+        [class.is-active]="documentsMode"
+        [attr.aria-selected]="documentsMode"
+        (click)="mode.set('documents')"
+      >
+        <app-icon name="files" [size]="16" /> Documentos
+        <span class="badge">{{ groups().length }}</span>
+      </button>
+    </div>
+    <p class="toolbar__hint">
+      @if (documentsMode) {
+        Arrastra un documento para moverlo con todas sus páginas
+      } @else {
+        Arrastra para mover · Ctrl o ⇧ + clic, o un recuadro, para elegir varias
+      }
+    </p>
+  </div>
+
+  <div class="toolbar__end">
+    @if (documentsMode) {
+      <button
+        type="button"
+        class="btn"
+        title="Ordenar por nombre, de la A a la Z"
+        (click)="sort('asc')"
+      >
+        <app-icon name="sortAsc" [size]="16" /> <span class="hide-sm">A → Z</span>
+      </button>
+      <button
+        type="button"
+        class="btn"
+        title="Ordenar por nombre, de la Z a la A"
+        (click)="sort('desc')"
+      >
+        <app-icon name="sortDesc" [size]="16" /> <span class="hide-sm">Z → A</span>
+      </button>
+    } @else {
+      <label class="zoom hide-sm" title="Tamaño de las miniaturas">
+        <app-icon name="zoomOut" [size]="15" />
+        <input
+          type="range"
+          class="form-range"
+          step="10"
+          [min]="minThumbnail"
+          [max]="maxThumbnail"
+          [value]="thumbnailSize()"
+          (input)="setThumbnailSize($event)"
+          aria-label="Tamaño de las miniaturas"
+        />
+        <app-icon name="zoomIn" [size]="15" />
+      </label>
+    }
+    <button type="button" class="btn hide-sm" title="Invertir el orden" (click)="reverse()">
+      <app-icon name="reverse" [size]="16" /> Invertir
+    </button>
+    <button
+      type="button"
+      class="btn"
+      title="Añadir PDFs o imágenes al final"
+      (click)="actions.pickAndInsert(documentStore.pageCount())"
+    >
+      <app-icon name="filePlus" [size]="16" /> <span class="hide-sm">Añadir</span>
+    </button>
+    <button type="button" class="btn btn--primary" (click)="done()">Listo</button>
+  </div>
+</header>
+
+@if (documentsMode) {
+  <app-document-grid [sourceColors]="sourceColors()" (showPages)="showSourcePages($event)" />
+} @else {
+  @if (editorStore.selectedPageCount()) {
+    <app-selection-toolbar />
+  } @else if (groups().length > 1) {
+    <app-source-legend
+      [groups]="groups()"
+      [colors]="sourceColors()"
+      (selectSource)="selectSource($event)"
+    />
+  }
+  <app-page-grid [thumbnailSize]="thumbnailSize()" [sourceColors]="sourceColors()" />
+}

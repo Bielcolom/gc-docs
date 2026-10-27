@@ -1,0 +1,27 @@
+<button
+  type="button"
+  class="btn"
+  title="Traer al frente"
+  (click)="documentStore.moveAnnotationInStack(annotation().id, 'front')"
+>
+  <app-icon name="front" [size]="16" /> Delante
+</button>
+<button
+  type="button"
+  class="btn"
+  title="Enviar atrás"
+  (click)="documentStore.moveAnnotationInStack(annotation().id, 'back')"
+>
+  <app-icon name="back" [size]="16" /> Detrás
+</button>
+<button type="button" class="btn" title="Duplicar (Ctrl+D)" (click)="commands.duplicateSelected()">
+  <app-icon name="copy" [size]="16" /> Duplicar
+</button>
+<button
+  type="button"
+  class="btn btn--danger-hover"
+  title="Eliminar (Supr)"
+  (click)="documentStore.removeAnnotation(annotation().id)"
+>
+  <app-icon name="trash" [size]="16" /> Eliminar
+</button>

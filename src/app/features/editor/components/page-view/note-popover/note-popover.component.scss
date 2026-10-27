@@ -1,0 +1,23 @@
+@use 'mixins' as m;
+
+:host {
+  @include m.popover;
+
+  position: absolute;
+  z-index: 5;
+  width: 230px;
+  padding: 8px;
+  user-select: text;
+  border-radius: 10px;
+}
+
+.form-input--textarea {
+  min-height: 96px;
+  font-size: 13px;
+}
+
+.actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+}

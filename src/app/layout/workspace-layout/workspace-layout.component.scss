@@ -1,0 +1,24 @@
+@use 'breakpoints' as bp;
+
+:host {
+  display: grid;
+  grid-template-rows: var(--topbar-height) minmax(0, 1fr);
+  height: 100%;
+  background: var(--color-desk);
+
+  @include bp.down(sm) {
+    --topbar-height: 52px;
+  }
+}
+
+.content {
+  // La página activa (editor u organizador) ocupa toda la celda.
+  display: grid;
+  grid-template: minmax(0, 1fr) / minmax(0, 1fr);
+  min-width: 0;
+  min-height: 0;
+}
+
+router-outlet {
+  display: none;
+}

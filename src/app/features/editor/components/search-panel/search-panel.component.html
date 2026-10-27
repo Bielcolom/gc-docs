@@ -1,0 +1,70 @@
+@let hits = editorStore.searchHits();
+@let active = editorStore.activeHitIndex();
+<div class="search-box">
+  <app-icon name="search" [size]="16" />
+  <input
+    type="search"
+    placeholder="Buscar en el documento"
+    aria-label="Buscar en el documento"
+    [value]="search.query()"
+    (input)="onInput($event)"
+    (keydown)="onKeydown($event)"
+    appAutofocus
+  />
+</div>
+
+@if (search.query().trim().length >= search.minQueryLength) {
+  <div class="status">
+    <span aria-live="polite">
+      @if (search.searching()) {
+        Buscando…
+      } @else if (hits.length) {
+        {{ active + 1 }} de {{ hits.length }}
+      } @else {
+        Sin resultados
+      }
+    </span>
+    <div>
+      <button
+        type="button"
+        class="btn btn--icon btn--sm"
+        title="Anterior (⇧ Intro)"
+        aria-label="Resultado anterior"
+        [disabled]="!hits.length"
+        (click)="search.previous()"
+      >
+        <app-icon name="chevronUp" [size]="16" />
+      </button>
+      <button
+        type="button"
+        class="btn btn--icon btn--sm"
+        title="Siguiente (Intro)"
+        aria-label="Resultado siguiente"
+        [disabled]="!hits.length"
+        (click)="search.next()"
+      >
+        <app-icon name="chevronDown" [size]="16" />
+      </button>
+    </div>
+  </div>
+  <ul class="results">
+    @for (hit of hits; track $index; let i = $index) {
+      <li>
+        <button
+          type="button"
+          class="result"
+          [class.is-active]="active === i"
+          (click)="search.goTo(i)"
+        >
+          <span class="result__page">Pág. {{ hit.pageIndex + 1 }}</span>
+          <span class="result__snippet"
+            >…{{ hit.before }}<mark>{{ hit.match }}</mark
+            >{{ hit.after }}</span
+          >
+        </button>
+      </li>
+    }
+  </ul>
+} @else {
+  <p class="form-hint">Escribe al menos dos letras. No distingue mayúsculas ni tildes.</p>
+}

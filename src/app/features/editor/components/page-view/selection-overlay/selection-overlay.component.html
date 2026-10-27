@@ -1,0 +1,55 @@
+@let b = box();
+@if (!isLine()) {
+  <div
+    class="frame"
+    [style.left.px]="b.left"
+    [style.top.px]="b.top"
+    [style.width.px]="b.width"
+    [style.height.px]="b.height"
+  ></div>
+}
+@for (h of handles(); track h.handle) {
+  <div
+    class="handle"
+    [class]="'handle handle--' + h.handle"
+    [style.left.px]="h.left"
+    [style.top.px]="h.top"
+    (pointerdown)="onHandleDown(h.handle, $event)"
+  ></div>
+}
+<div
+  class="toolbar"
+  role="toolbar"
+  aria-label="Acciones del elemento"
+  [style.left.px]="b.left + b.width"
+  [style.top.px]="b.top"
+  (pointerdown)="$event.stopPropagation()"
+>
+  @if (isText()) {
+    <button
+      type="button"
+      title="Editar texto (Intro)"
+      aria-label="Editar texto"
+      (click)="editRequest.emit()"
+    >
+      <app-icon name="text" [size]="15" />
+    </button>
+  }
+  <button
+    type="button"
+    title="Duplicar (Ctrl+D)"
+    aria-label="Duplicar"
+    (click)="duplicateRequest.emit()"
+  >
+    <app-icon name="copy" [size]="15" />
+  </button>
+  <button
+    type="button"
+    class="danger"
+    title="Eliminar (Supr)"
+    aria-label="Eliminar"
+    (click)="removeRequest.emit()"
+  >
+    <app-icon name="trash" [size]="15" />
+  </button>
+</div>

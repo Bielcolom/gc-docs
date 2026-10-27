@@ -1,0 +1,68 @@
+@use 'breakpoints' as bp;
+
+:host {
+  display: grid;
+  grid-template-areas: 'rail sidebar viewer inspector';
+  grid-template-columns: auto auto minmax(0, 1fr) auto;
+  min-height: 0;
+
+  @include bp.down(sm) {
+    grid-template-areas:
+      'viewer'
+      'rail';
+    grid-template-rows: minmax(0, 1fr) auto;
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.rail {
+  grid-area: rail;
+}
+
+.sidebar {
+  grid-area: sidebar;
+  width: 220px;
+
+  @include bp.down(md) {
+    position: fixed;
+    top: var(--topbar-height);
+    bottom: 0;
+    left: 60px;
+    z-index: 25;
+    box-shadow: 12px 0 30px -12px rgb(0 0 0 / 25%);
+  }
+
+  @include bp.down(sm) {
+    bottom: 58px;
+    left: 0;
+  }
+}
+
+.viewer {
+  grid-area: viewer;
+}
+
+.inspector {
+  grid-area: inspector;
+  width: 290px;
+
+  @include bp.down(lg) {
+    position: fixed;
+    top: var(--topbar-height);
+    right: 0;
+    bottom: 0;
+    z-index: 25;
+    box-shadow: -12px 0 30px -12px rgb(0 0 0 / 25%);
+  }
+
+  @include bp.down(sm) {
+    top: auto;
+    left: 0;
+    bottom: 58px;
+    width: auto;
+    max-height: 55vh;
+    border-top: 1px solid var(--color-line);
+    border-left: 0;
+    border-radius: 16px 16px 0 0;
+  }
+}

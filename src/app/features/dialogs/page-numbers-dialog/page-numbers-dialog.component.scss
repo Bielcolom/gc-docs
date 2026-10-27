@@ -1,0 +1,93 @@
+@use 'mixins' as m;
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chip {
+  input {
+    @include m.visually-hidden;
+  }
+
+  span {
+    display: inline-flex;
+    align-items: center;
+    height: 32px;
+    padding: 0 12px;
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+    cursor: pointer;
+    background: var(--color-surface);
+    border: 1px solid var(--color-line);
+    border-radius: 8px;
+  }
+
+  input:checked + span {
+    background: var(--color-surface-2);
+    border-color: var(--color-ink);
+    box-shadow: 0 0 0 1px var(--color-ink);
+  }
+
+  input:focus-visible + span {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
+  }
+}
+
+// Miniatura de página con seis posiciones posibles.
+.position-picker {
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  grid-template-columns: repeat(3, 1fr);
+  align-content: space-between;
+  width: 120px;
+  height: 150px;
+  padding: 6px;
+  background: #fff;
+  border-radius: 6px;
+  box-shadow:
+    0 0 0 1px var(--color-line-strong),
+    0 4px 10px -4px rgb(0 0 0 / 20%);
+
+  &__slot {
+    display: grid;
+    place-items: center;
+    height: 34px;
+    cursor: pointer;
+    border-radius: 6px;
+
+    &:nth-child(-n + 3) {
+      align-self: start;
+    }
+
+    &:nth-child(n + 4) {
+      align-self: end;
+    }
+
+    input {
+      @include m.visually-hidden;
+    }
+
+    span {
+      width: 18px;
+      height: 6px;
+      background: #cfd5dc;
+      border-radius: 2px;
+    }
+
+    &:hover span {
+      background: #8a96a3;
+    }
+
+    input:checked + span {
+      background: #16263a;
+    }
+
+    input:focus-visible + span {
+      outline: 2px solid #16263a;
+      outline-offset: 4px;
+    }
+  }
+}

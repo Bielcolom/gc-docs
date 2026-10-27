@@ -1,0 +1,14 @@
+<app-dialog-shell [title]="data.title">
+  <p class="text-body">{{ data.message }}</p>
+  <ng-container dialogFooter>
+    <button type="button" class="btn" (click)="dialogRef.close(false)">Cancelar</button>
+    <button
+      type="button"
+      class="btn btn--primary"
+      [class.btn--danger]="data.danger"
+      (click)="dialogRef.close(true)"
+    >
+      {{ data.confirmLabel }}
+    </button>
+  </ng-container>
+</app-dialog-shell>

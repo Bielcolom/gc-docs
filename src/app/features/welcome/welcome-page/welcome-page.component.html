@@ -1,0 +1,65 @@
+<div
+  class="desk"
+  (dragover)="onDragOver($event)"
+  (dragleave)="isDraggingOver.set(false)"
+  (drop)="onDrop($event)"
+>
+  <div class="layout">
+    <article class="sheet" [class.is-drop-target]="isDraggingOver()">
+      <div class="sheet__fold" aria-hidden="true"></div>
+      <app-brand-logo class="sheet__brand" size="lg" />
+
+      <h1 class="sheet__title">Abre un PDF y cámbialo como si fuera papel.</h1>
+      <p class="sheet__lede">
+        Reescribe su texto, fírmalo, rellena sus campos y ordena sus páginas. Todo ocurre en tu
+        navegador: el archivo no se sube a ningún servidor.
+      </p>
+
+      <div class="sheet__cta">
+        <button type="button" class="btn btn--primary btn--lg" (click)="open()">
+          <app-icon name="folder" [size]="19" /> Abrir PDF
+        </button>
+        <span class="sheet__or">o suéltalo en esta hoja</span>
+      </div>
+
+      <div class="sheet__alternatives">
+        <button type="button" class="btn" (click)="openBlank()">
+          <app-icon name="file" [size]="16" /> Empezar en blanco
+        </button>
+        <button type="button" class="btn" (click)="convertImages()">
+          <app-icon name="image" [size]="16" /> Convertir imágenes a PDF
+        </button>
+      </div>
+
+      <div class="sheet__drop-hint" aria-hidden="true">
+        <app-icon name="download" [size]="28" />
+        <span>Suelta para abrir</span>
+      </div>
+    </article>
+
+    <aside class="notes" aria-labelledby="capabilities-title">
+      <h2 id="capabilities-title" class="notes__title">Qué puedes hacer</h2>
+      <ul class="notes__list">
+        @for (capability of capabilities; track capability.title) {
+          <li class="notes__item">
+            <strong>{{ capability.title }}</strong>
+            <span>{{ capability.description }}</span>
+          </li>
+        }
+      </ul>
+      <p class="notes__privacy">
+        <app-icon name="lock" [size]="15" /> Sin registro, sin subidas, sin marcas de agua
+        impuestas.
+      </p>
+    </aside>
+  </div>
+
+  <button
+    type="button"
+    class="btn btn--icon theme-toggle"
+    [attr.aria-label]="theme.theme() === 'dark' ? 'Cambiar a tema claro' : 'Cambiar a tema oscuro'"
+    (click)="theme.toggle()"
+  >
+    <app-icon [name]="theme.theme() === 'dark' ? 'sun' : 'moon'" />
+  </button>
+</div>

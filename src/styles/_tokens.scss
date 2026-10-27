@@ -1,0 +1,82 @@
+// Tokens de diseño: colores, tipografía, radios y sombras como variables CSS.
+// La mesa de trabajo es gris salvia, las hojas blancas y la tinta azul marino.
+// El único acento es el amarillo de rotulador, reservado para lo que está activo.
+
+@mixin light-theme {
+  --color-desk: #e3e6e0;
+  --color-desk-dot: rgb(22 38 58 / 7%);
+  --color-surface: #fbfbf8;
+  --color-surface-2: #f1f3ef;
+  --color-ink: #16263a;
+  --color-ink-2: #4c5866;
+  --color-ink-3: #6f7a86;
+  --color-line: #dde1da;
+  --color-line-soft: #e9ece6;
+  --color-line-strong: #c9cfc7;
+  --color-marker-soft: #fff5c2;
+  --color-selection: #2a6fdb;
+  --color-danger: #b3261e;
+  --color-focus: #16263a;
+  --color-focus-soft: rgb(22 38 58 / 14%);
+  --color-sheet-edge: rgb(22 38 58 / 10%);
+  --color-sheet-edge-strong: rgb(22 38 58 / 22%);
+  --color-tooltip: #16263a;
+  --color-tooltip-ink: #f5f6f2;
+  --color-inverse: #16263a;
+  --color-inverse-ink: #fbfbf8;
+  --color-scrim: rgb(18 26 36 / 42%);
+  --shadow-pop: 0 12px 32px -10px rgb(22 38 58 / 35%), 0 2px 6px rgb(22 38 58 / 8%);
+  color-scheme: light;
+}
+
+@mixin dark-theme {
+  --color-desk: #151a1f;
+  --color-desk-dot: rgb(255 255 255 / 4.5%);
+  --color-surface: #1d232a;
+  --color-surface-2: #262d35;
+  --color-ink: #e9edf0;
+  --color-ink-2: #a9b3bd;
+  --color-ink-3: #8a95a1;
+  --color-line: #303841;
+  --color-line-soft: #2a3139;
+  --color-line-strong: #3c4550;
+  --color-marker-soft: rgb(255 225 77 / 14%);
+  --color-selection: #5b9bff;
+  --color-danger: #ff7b70;
+  --color-focus: #e9edf0;
+  --color-focus-soft: rgb(233 237 240 / 16%);
+  --color-sheet-edge: rgb(0 0 0 / 40%);
+  --color-sheet-edge-strong: rgb(255 255 255 / 25%);
+  --color-tooltip: #f1f3ef;
+  --color-tooltip-ink: #16263a;
+  --color-inverse: #f1f3ef;
+  --color-inverse-ink: #16263a;
+  --color-scrim: rgb(0 0 0 / 55%);
+  --shadow-pop: 0 14px 36px -10px rgb(0 0 0 / 60%), 0 2px 6px rgb(0 0 0 / 30%);
+  color-scheme: dark;
+}
+
+:root {
+  @include light-theme;
+
+  // Comunes a los dos temas
+  --color-marker: #ffe14d;
+  --color-marker-deep: #e0b400;
+  --color-paper-ink: #16263a;
+
+  --font-ui:
+    'Schibsted Grotesk Variable', 'Schibsted Grotesk', system-ui, -apple-system, 'Segoe UI',
+    sans-serif;
+  --font-display: 'Bricolage Grotesque Variable', 'Bricolage Grotesque', var(--font-ui);
+
+  --radius-sm: 6px;
+  --radius-md: 9px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+
+  --topbar-height: 56px;
+}
+
+:root[data-theme='dark'] {
+  @include dark-theme;
+}

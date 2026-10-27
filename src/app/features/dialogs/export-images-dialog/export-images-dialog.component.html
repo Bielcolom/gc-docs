@@ -1,0 +1,30 @@
+<app-dialog-shell title="Guardar como imágenes">
+  <form
+    id="images-form"
+    class="choices"
+    [formGroup]="form"
+    (ngSubmit)="submit()"
+    role="radiogroup"
+    aria-label="Calidad"
+  >
+    @for (quality of qualities; track quality.dpi) {
+      <label class="choices__option">
+        <input type="radio" formControlName="dpi" [value]="quality.dpi" />
+        <span class="choices__body">
+          <strong>{{ quality.title }} · {{ quality.dpi }} ppp</strong>
+          <small>{{ quality.description }}</small>
+        </span>
+      </label>
+    }
+  </form>
+  <ng-container dialogFooter>
+    <span class="summary">
+      @if (pageCount() === 1) {
+        Se descargará un PNG
+      } @else {
+        Se descargará un ZIP con {{ pageCount() }} PNG
+      }
+    </span>
+    <button type="submit" form="images-form" class="btn btn--primary">Guardar imágenes</button>
+  </ng-container>
+</app-dialog-shell>

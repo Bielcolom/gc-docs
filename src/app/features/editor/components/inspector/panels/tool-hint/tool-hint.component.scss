@@ -1,0 +1,19 @@
+:host {
+  display: block;
+  padding-top: 12px;
+}
+
+.hint {
+  display: flex;
+  gap: 12px;
+  padding: 14px;
+  color: var(--color-ink);
+  background: var(--color-marker-soft);
+  border-radius: var(--radius-lg);
+
+  p {
+    margin: 0;
+    font-size: 13.5px;
+    line-height: 1.5;
+  }
+}

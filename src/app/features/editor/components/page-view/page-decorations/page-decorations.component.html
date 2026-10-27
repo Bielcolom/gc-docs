@@ -1,0 +1,23 @@
+@let wm = watermark();
+@if (wm.enabled && wm.text) {
+  <div
+    class="watermark"
+    [style.font-size.px]="wm.size * zoom()"
+    [style.color]="wm.color"
+    [style.opacity]="wm.opacity"
+    [style.transform]="watermarkTransform()"
+  >
+    {{ wm.text }}
+  </div>
+}
+@if (pageLabel(); as label) {
+  <div
+    class="page-number"
+    [class]="'page-number page-number--' + numbers().position"
+    [style.font-size.px]="numbers().size * zoom()"
+    [style.color]="numbers().color"
+    [style.--margin.px]="margin()"
+  >
+    {{ label }}
+  </div>
+}

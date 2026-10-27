@@ -1,0 +1,30 @@
+@let tab = editorStore.sidebarTab();
+<div class="segmented segmented--block tabs" role="tablist" aria-label="Panel lateral">
+  <button
+    type="button"
+    role="tab"
+    class="segmented__option"
+    [class.is-active]="tab === 'pages'"
+    [attr.aria-selected]="tab === 'pages'"
+    (click)="editorStore.sidebarTab.set('pages')"
+  >
+    <app-icon name="pages" [size]="16" /> Páginas
+    <span class="badge">{{ documentStore.pageCount() }}</span>
+  </button>
+  <button
+    type="button"
+    role="tab"
+    class="segmented__option"
+    [class.is-active]="tab === 'search'"
+    [attr.aria-selected]="tab === 'search'"
+    (click)="editorStore.sidebarTab.set('search')"
+  >
+    <app-icon name="search" [size]="16" /> Buscar
+  </button>
+</div>
+
+@if (tab === 'pages') {
+  <app-page-list />
+} @else {
+  <app-search-panel />
+}

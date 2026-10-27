@@ -1,0 +1,56 @@
+<div class="paper" [style.--source-color]="sourceColor()" (dblclick)="open.emit()">
+  <app-page-thumbnail [page]="page()" [resolution]="thumbnailSize() * 1.25" />
+  @if (sourceColor()) {
+    <span class="stripe" aria-hidden="true"></span>
+  }
+  <button
+    type="button"
+    class="check"
+    [class.is-on]="selected()"
+    [attr.aria-pressed]="selected()"
+    [attr.aria-label]="
+      (selected() ? 'Quitar de la selección la página ' : 'Seleccionar la página ') + position()
+    "
+    (click)="toggleSelection.emit()"
+  >
+    <app-icon name="check" [size]="12" [strokeWidth]="3" />
+  </button>
+  <button type="button" class="grip" aria-label="Arrastrar para mover">
+    <app-icon name="grip" [size]="16" [strokeWidth]="3" />
+  </button>
+  <div class="actions">
+    <button
+      type="button"
+      title="Girar a la izquierda"
+      aria-label="Girar a la izquierda"
+      (click)="rotate.emit(-90)"
+    >
+      <app-icon name="rotateCcw" [size]="14" />
+    </button>
+    <button
+      type="button"
+      title="Girar a la derecha"
+      aria-label="Girar a la derecha"
+      (click)="rotate.emit(90)"
+    >
+      <app-icon name="rotateCw" [size]="14" />
+    </button>
+    <button
+      type="button"
+      class="danger"
+      title="Eliminar página"
+      aria-label="Eliminar página"
+      (click)="remove.emit()"
+    >
+      <app-icon name="trash" [size]="14" />
+    </button>
+  </div>
+</div>
+<div class="meta">
+  <span class="number">{{ position() }}</span>
+  @if (sourceName(); as name) {
+    <span class="source" [title]="name + ', página ' + (page().sourceIndex + 1)"
+      >{{ name }} · {{ page().sourceIndex + 1 }}</span
+    >
+  }
+</div>

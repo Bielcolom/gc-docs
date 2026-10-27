@@ -1,0 +1,46 @@
+@let colors = sourceColors();
+@let names = sourceNames();
+<div #scroller class="scroller" (pointerdown)="onBackgroundPointerDown($event)">
+  <div
+    #grid
+    class="grid"
+    [class.is-dragging]="!!drag.preview()"
+    [style.--column-width.px]="thumbnailSize()"
+    role="list"
+    aria-label="Páginas del documento"
+  >
+    @for (page of pages(); track page.id; let i = $index) {
+      <app-page-card
+        role="listitem"
+        [page]="page"
+        [position]="i + 1"
+        [selected]="selection().has(page.id)"
+        [moving]="movingIds().has(page.id)"
+        [thumbnailSize]="thumbnailSize()"
+        [sourceColor]="showSources() ? (colors.get(page.sourceId) ?? null) : null"
+        [sourceName]="showSources() ? (names.get(page.sourceId) ?? null) : null"
+        [animate]="animate()"
+        (pointerdown)="onCardPointerDown($event, page)"
+        (toggleSelection)="toggle(page)"
+        (rotate)="rotate(page, $event)"
+        (remove)="remove(page)"
+        (open)="open(i)"
+      />
+    }
+    @if (drag.indicator(); as indicator) {
+      <app-drop-indicator [position]="indicator" />
+    }
+    @if (marquee.rect(); as rect) {
+      <div
+        class="marquee"
+        [style.left.px]="rect.x"
+        [style.top.px]="rect.y"
+        [style.width.px]="rect.w"
+        [style.height.px]="rect.h"
+      ></div>
+    }
+  </div>
+</div>
+@if (drag.preview(); as preview) {
+  <app-drag-ghost [preview]="preview" />
+}

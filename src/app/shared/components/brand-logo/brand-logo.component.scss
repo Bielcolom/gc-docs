@@ -1,0 +1,39 @@
+@use 'breakpoints' as bp;
+
+:host {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  font-family: var(--font-display);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: inherit;
+}
+
+.mark {
+  width: 26px;
+  height: 26px;
+}
+
+.name {
+  font-size: 19px;
+}
+
+:host(.is-large) {
+  gap: 10px;
+
+  .mark {
+    width: 34px;
+    height: 34px;
+  }
+
+  .name {
+    font-size: 26px;
+  }
+}
+
+:host(.compact-on-mobile) .name {
+  @include bp.down(sm) {
+    display: none;
+  }
+}

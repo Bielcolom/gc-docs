@@ -1,0 +1,33 @@
+<div #scroller class="scroller">
+  <div
+    #grid
+    class="grid"
+    [class.is-dragging]="!!drag.preview()"
+    role="list"
+    aria-label="Documentos"
+  >
+    @for (group of groups(); track group.sourceId; let i = $index) {
+      <app-document-card
+        role="listitem"
+        [group]="group"
+        [position]="i + 1"
+        [total]="groups().length"
+        [color]="sourceColors().get(group.sourceId) ?? '#4a4f55'"
+        [moving]="movingId() === group.sourceId"
+        [animate]="true"
+        (pointerdown)="onCardPointerDown($event, group)"
+        (moveBy)="moveBy(group, $event)"
+        (showPages)="showPages.emit(group.sourceId)"
+        (rotate)="rotate(group)"
+        (remove)="remove(group)"
+      />
+    }
+    @if (drag.indicator(); as indicator) {
+      <app-drop-indicator [position]="indicator" />
+    }
+  </div>
+  <p class="note">Al mover un documento, todas sus páginas se colocan juntas en su orden actual.</p>
+</div>
+@if (drag.preview(); as preview) {
+  <app-drag-ghost [preview]="preview" />
+}

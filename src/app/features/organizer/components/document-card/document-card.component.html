@@ -1,0 +1,68 @@
+@let g = group();
+<div class="cover" [style.--source-color]="color()" (dblclick)="showPages.emit()">
+  @if (g.pages.length > 2) {
+    <span class="sheet sheet--back"></span>
+  }
+  @if (g.pages.length > 1) {
+    <span class="sheet sheet--middle"></span>
+  }
+  <div class="paper">
+    <app-page-thumbnail [page]="g.pages[0]" [resolution]="260" />
+    <span class="stripe" aria-hidden="true"></span>
+    <button type="button" class="grip" aria-label="Arrastrar para mover">
+      <app-icon name="grip" [size]="16" [strokeWidth]="3" />
+    </button>
+  </div>
+</div>
+<div class="info">
+  <span class="order">{{ position() }}</span>
+  <div class="info__text">
+    <strong [title]="g.name">{{ g.name }}</strong>
+    <small>{{ g.pages.length | plural: 'página' : 'páginas' }}</small>
+  </div>
+</div>
+<div class="actions">
+  <button
+    type="button"
+    title="Mover antes"
+    aria-label="Mover antes"
+    [disabled]="position() === 1"
+    (click)="moveBy.emit(-1)"
+  >
+    <app-icon name="arrowLeft" [size]="15" />
+  </button>
+  <button
+    type="button"
+    title="Mover después"
+    aria-label="Mover después"
+    [disabled]="position() === total()"
+    (click)="moveBy.emit(1)"
+  >
+    <app-icon name="arrowRight" [size]="15" />
+  </button>
+  <button
+    type="button"
+    title="Ver sus páginas"
+    aria-label="Ver sus páginas"
+    (click)="showPages.emit()"
+  >
+    <app-icon name="grid" [size]="15" />
+  </button>
+  <button
+    type="button"
+    title="Girar todas sus páginas"
+    aria-label="Girar todas sus páginas"
+    (click)="rotate.emit()"
+  >
+    <app-icon name="rotateCw" [size]="15" />
+  </button>
+  <button
+    type="button"
+    class="danger"
+    title="Quitar este documento"
+    aria-label="Quitar este documento"
+    (click)="remove.emit()"
+  >
+    <app-icon name="trash" [size]="15" />
+  </button>
+</div>

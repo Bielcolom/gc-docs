@@ -1,0 +1,94 @@
+<nav class="rail" aria-label="Herramientas">
+  @for (group of groups; track $index; let last = $last) {
+    @for (item of group; track item.label) {
+      @switch (item.kind) {
+        @case ('tool') {
+          <button
+            type="button"
+            class="tool"
+            [class.is-active]="activeItem() === item.tool"
+            [attr.aria-pressed]="activeItem() === item.tool"
+            [attr.aria-label]="item.label"
+            (click)="selectTool(item.tool)"
+          >
+            <app-icon [name]="item.icon" [size]="20" />
+            <span class="tool__tip" aria-hidden="true"
+              >{{ item.label }}
+              @if (item.shortcut) {
+                <kbd>{{ item.shortcut }}</kbd>
+              }
+            </span>
+          </button>
+        }
+        @case ('action') {
+          <button
+            type="button"
+            class="tool"
+            [attr.aria-label]="item.label"
+            (click)="run(item.action)"
+          >
+            <app-icon [name]="item.icon" [size]="20" />
+            <span class="tool__tip" aria-hidden="true"
+              >{{ item.label }}
+              @if (item.shortcut) {
+                <kbd>{{ item.shortcut }}</kbd>
+              }
+            </span>
+          </button>
+        }
+        @case ('menu') {
+          <button
+            type="button"
+            class="tool tool--menu"
+            [class.is-active]="activeItem() === item.menu"
+            [attr.aria-label]="item.label"
+            [cdkMenuTriggerFor]="item.menu === 'shapes' ? shapesMenu : symbolsMenu"
+            [cdkMenuPosition]="menuPositions"
+          >
+            <app-icon [name]="item.menu === 'shapes' ? shapesIcon() : symbolIcon()" [size]="20" />
+            <span class="tool__corner" aria-hidden="true"></span>
+            <span class="tool__tip" aria-hidden="true">{{ item.label }}</span>
+          </button>
+        }
+      }
+    }
+    @if (!last) {
+      <span class="separator" role="separator"></span>
+    }
+  }
+</nav>
+
+<ng-template #shapesMenu>
+  <div class="app-menu" cdkMenu aria-label="Formas">
+    @for (shape of shapeTools; track shape.tool) {
+      <button
+        type="button"
+        class="app-menu__item"
+        cdkMenuItem
+        [class.is-active]="editorStore.tool() === shape.tool"
+        (cdkMenuItemTriggered)="selectTool(shape.tool)"
+      >
+        <app-icon [name]="shape.icon" /> <span>{{ shape.label }}</span>
+        <kbd>{{ shape.shortcut }}</kbd>
+      </button>
+    }
+  </div>
+</ng-template>
+
+<ng-template #symbolsMenu>
+  <div class="app-menu" cdkMenu aria-label="Marcas">
+    @for (symbol of symbols; track symbol.kind) {
+      <button
+        type="button"
+        class="app-menu__item"
+        cdkMenuItem
+        [class.is-active]="
+          editorStore.tool() === 'symbol' && editorStore.toolStyle().symbol === symbol.kind
+        "
+        (cdkMenuItemTriggered)="selectSymbol(symbol.kind)"
+      >
+        <app-icon [name]="symbol.icon" [strokeWidth]="2.4" /> <span>{{ symbol.label }}</span>
+      </button>
+    }
+  </div>
+</ng-template>

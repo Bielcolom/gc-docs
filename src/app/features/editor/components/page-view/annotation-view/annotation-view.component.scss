@@ -1,0 +1,83 @@
+:host {
+  position: absolute;
+  pointer-events: none;
+}
+
+.svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.hit-area {
+  fill: none;
+  stroke: transparent;
+  stroke-width: 12;
+}
+
+.highlight {
+  position: absolute;
+  inset: 0;
+
+  &--highlight {
+    mix-blend-mode: multiply;
+    opacity: calc(0.45 * var(--opacity, 1));
+  }
+
+  &--underline,
+  &--strike {
+    height: max(1.5px, 8%);
+    opacity: var(--opacity, 1);
+  }
+
+  &--underline {
+    top: auto;
+  }
+
+  &--strike {
+    top: 50%;
+    bottom: auto;
+    transform: translateY(-50%);
+  }
+}
+
+.image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.note {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  color: #16263a;
+  border-radius: 5px 5px 5px 1px;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 25%);
+}
+
+// El padre marca las anotaciones con `is-interactive` cuando se pueden seleccionar y mover.
+:host(.is-interactive) {
+  pointer-events: auto;
+  cursor: move;
+}
+
+// En líneas y flechas solo se puede agarrar el trazo, no su caja.
+:host(.is-interactive.annotation--line),
+:host(.is-interactive.annotation--arrow) {
+  pointer-events: none;
+
+  .hit-area {
+    pointer-events: stroke;
+    cursor: move;
+  }
+}
+
+:host(.is-draft) {
+  pointer-events: none !important;
+}

@@ -1,0 +1,10 @@
+@let p = preview();
+@if (p.ids.length > 1) {
+  <span class="stack"></span>
+}
+<div class="paper"><app-page-thumbnail [page]="p.page" [resolution]="140" /></div>
+@if (p.label) {
+  <span class="label">{{ p.label }}</span>
+} @else if (p.ids.length > 1) {
+  <span class="count">{{ p.ids.length }}</span>
+}
