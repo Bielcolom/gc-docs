@@ -1,0 +1,23 @@
+# Actualizaciones semanales de dependencias. Cada familia se agrupa en un solo PR.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      angular:
+        patterns: ['@angular/*', '@angular-devkit/*', 'angular-eslint', '@angular-eslint/*']
+      lint:
+        patterns: ['eslint', '@eslint/*', 'typescript-eslint', 'eslint-config-prettier', 'prettier']
+      test:
+        patterns: ['vitest', '@vitest/*', 'jsdom']
+    commit-message:
+      prefix: build
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    commit-message:
+      prefix: ci

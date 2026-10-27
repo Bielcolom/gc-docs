@@ -1,0 +1,77 @@
+# Integración y despliegue continuos.
+# - En cada pull request: calidad (lint, formato, tests) y compilación.
+# - En cada push a main: lo mismo y, si todo pasa, publicación en GitHub Pages.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: Lint y tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run format:check
+      - run: npm run test:coverage
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage
+          path: coverage/
+          retention-days: 7
+
+  build:
+    name: Compilación
+    needs: quality
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Compilar para GitHub Pages
+        run: npx ng build --base-href "/${{ github.event.repository.name }}/"
+      # GitHub Pages no conoce las rutas de Angular: si alguien recarga /documento/editar
+      # sirve 404.html, que es la propia app, y el router se encarga del resto.
+      - name: Fallback para las rutas de la SPA
+        run: cp dist/gc-docs/browser/index.html dist/gc-docs/browser/404.html
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist/gc-docs/browser
+
+  deploy:
+    name: Publicar
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
