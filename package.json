@@ -1,0 +1,44 @@
+{
+  "name": "gc-docs",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "ng serve",
+    "build": "ng build",
+    "build:pages": "ng build --base-href /gc-docs/",
+    "watch": "ng build --watch --configuration development"
+  },
+  "private": true,
+  "packageManager": "npm@10.9.9",
+  "dependencies": {
+    "@angular/common": "^22.2.0",
+    "@angular/compiler": "^22.2.0",
+    "@angular/core": "^22.2.0",
+    "@angular/forms": "^22.2.0",
+    "@angular/platform-browser": "^22.2.0",
+    "@angular/router": "^22.2.0",
+    "@expo-google-fonts/caveat": "^0.4.2",
+    "@expo-google-fonts/dancing-script": "^0.4.2",
+    "@expo-google-fonts/great-vibes": "^0.4.1",
+    "@expo-google-fonts/lora": "^0.4.2",
+    "@expo-google-fonts/roboto": "^0.4.3",
+    "@expo-google-fonts/roboto-mono": "^0.4.2",
+    "@fontsource-variable/bricolage-grotesque": "^5.3.0",
+    "@fontsource-variable/schibsted-grotesk": "^5.3.0",
+    "@pdf-lib/fontkit": "^1.1.1",
+    "jszip": "^3.10.2",
+    "pdf-lib": "^1.17.1",
+    "pdfjs-dist": "^6.4.299",
+    "rxjs": "~7.8.0",
+    "tslib": "^2.3.0"
+  },
+  "devDependencies": {
+    "@angular/build": "^22.2.4",
+    "@angular/cli": "^22.2.4",
+    "@angular/compiler-cli": "^22.2.0",
+    "prettier": "^3.8.1",
+    "typescript": "~6.0.2"
+  },
+  "description": "Editor de PDF en el navegador hecho con Angular: edita el texto, firma, rellena formularios, une, divide y anota.",
+  "author": "Gabriel",
+  "license": "MIT"
+}

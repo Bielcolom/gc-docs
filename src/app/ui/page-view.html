@@ -1,0 +1,341 @@
+@let z = zoom();
+@let p = page();
+@let selId = store.selectedId();
+@let editId = store.editingId();
+@let tool = store.tool();
+
+<div
+  class="sheet"
+  #wrap
+  [style.width.px]="dispW() * z"
+  [style.height.px]="dispH() * z"
+  (dragover)="onDragOver($event)"
+  (drop)="onDrop($event)"
+>
+  <div
+    class="inner"
+    #inner
+    [class.interactive]="interactive()"
+    [class.mode-edit]="tool === 'editText'"
+    [style.width.px]="p.w * z"
+    [style.height.px]="p.h * z"
+    [style.transform]="'translate(-50%, -50%) rotate(' + p.rotation + 'deg)'"
+    [style.cursor]="cursor()"
+    (pointerdown)="onLayerDown($event)"
+  >
+    <canvas #canvas class="canvas"></canvas>
+    @if (!rendered()) {
+      <div class="loading" aria-hidden="true"></div>
+    }
+
+    @for (c of covers(); track c.id) {
+      <div
+        class="cover"
+        [style.left.px]="c.cover!.x * z"
+        [style.top.px]="c.cover!.y * z"
+        [style.width.px]="c.cover!.w * z"
+        [style.height.px]="c.cover!.h * z"
+        [style.background]="c.cover!.color"
+      ></div>
+    }
+
+    @for (f of fields(); track f.id) {
+      <div
+        class="field"
+        [style.left.px]="f.x * z"
+        [style.top.px]="f.y * z"
+        [style.width.px]="f.w * z"
+        [style.height.px]="f.h * z"
+        (pointerdown)="$event.stopPropagation()"
+      >
+        @switch (f.kind) {
+          @case ('text') {
+            @if (f.multiline) {
+              <textarea
+                [value]="fieldValue(f)"
+                [readOnly]="f.readOnly"
+                [style.font-size.px]="(f.fontSize || 10) * z"
+                (input)="setField(f, inputValue($event))"
+                [attr.aria-label]="f.name"
+              ></textarea>
+            } @else {
+              <input
+                type="text"
+                [value]="fieldValue(f)"
+                [readOnly]="f.readOnly"
+                [style.font-size.px]="(f.fontSize || Math.min(f.h * 0.62, 12)) * z"
+                (input)="setField(f, inputValue($event))"
+                [attr.aria-label]="f.name"
+              />
+            }
+          }
+          @case ('checkbox') {
+            <input type="checkbox" [checked]="fieldValue(f)" [disabled]="f.readOnly" (change)="setField(f, inputChecked($event))" [attr.aria-label]="f.name" />
+          }
+          @case ('radio') {
+            <input
+              type="radio"
+              [name]="p.id + f.name"
+              [checked]="radioChecked(f)"
+              [disabled]="f.readOnly"
+              (change)="setField(f, f.exportValue)"
+              [attr.aria-label]="f.name + ' ' + f.exportValue"
+            />
+          }
+          @case ('select') {
+            <select [value]="fieldValue(f)" [disabled]="f.readOnly" (change)="setField(f, inputValue($event))" [style.font-size.px]="Math.min(f.h * 0.6, 12) * z" [attr.aria-label]="f.name">
+              <option value=""></option>
+              @for (o of f.options; track o.value) {
+                <option [value]="o.value" [selected]="fieldValue(f) === o.value">{{ o.label }}</option>
+              }
+            </select>
+          }
+        }
+      </div>
+    }
+
+    @if (tool === 'editText') {
+      @for (l of lines(); track l.key) {
+        @if (!editedKeys().has(l.key)) {
+          <div
+            class="line"
+            [class.hover]="hoverLine() === l.key"
+            [style.left.px]="(l.x - 1) * z"
+            [style.top.px]="(l.y - 1) * z"
+            [style.width.px]="(l.w + 2) * z"
+            [style.height.px]="(l.h + 2) * z"
+            (pointerenter)="hoverLine.set(l.key)"
+            (pointerleave)="hoverLine.set(null)"
+            (pointerdown)="startLineEdit($event, l)"
+            title="Haz clic para editar este texto"
+          ></div>
+        }
+      }
+    }
+
+    @for (a of annots(); track a.id) {
+      <ng-container *ngTemplateOutlet="annotTpl; context: { $implicit: a, draft: false }" />
+    }
+    @if (draft(); as d) {
+      <ng-container *ngTemplateOutlet="annotTpl; context: { $implicit: d, draft: true }" />
+    }
+
+    @for (h of hits(); track $index) {
+      <div
+        class="hit"
+        [class.active]="h.active"
+        [style.left.px]="h.x * z"
+        [style.top.px]="h.y * z"
+        [style.width.px]="h.w * z"
+        [style.height.px]="h.h * z"
+      ></div>
+    }
+
+    <!-- Selección -->
+    @for (a of annots(); track a.id) {
+      @if (a.id === selId && tool === 'select' && editId !== a.id) {
+        @if (a.type !== 'line' && a.type !== 'arrow') {
+          <div class="sel-box" [style.left.px]="a.x * z" [style.top.px]="a.y * z" [style.width.px]="a.w * z" [style.height.px]="a.h * z"></div>
+        }
+        @for (h of handlesFor(a); track h) {
+          @let pos = handlePos(a, h);
+          <div
+            class="handle"
+            [class]="'handle h-' + h"
+            [style.left.px]="pos.left"
+            [style.top.px]="pos.top"
+            (pointerdown)="onHandleDown($event, a, h)"
+          ></div>
+        }
+        <div class="mini" [style.left.px]="(a.x + a.w) * z" [style.top.px]="a.y * z" (pointerdown)="$event.stopPropagation()">
+          @if (a.type === 'text') {
+            <button type="button" title="Editar texto" (click)="store.editingId.set(a.id)"><app-icon name="text" [size]="15" /></button>
+          }
+          <button type="button" title="Duplicar (Ctrl+D)" (click)="store.duplicateAnnot(a.id)"><app-icon name="copy" [size]="15" /></button>
+          <button type="button" class="danger" title="Eliminar (Supr)" (click)="store.removeAnnot(a.id)"><app-icon name="trash" [size]="15" /></button>
+        </div>
+      }
+    }
+
+    <!-- Nota abierta -->
+    @for (a of annots(); track a.id) {
+      @if (a.type === 'note' && editId === a.id) {
+        <div class="note-pop" [style.left.px]="(a.x + a.w + 6) * z" [style.top.px]="a.y * z" (pointerdown)="$event.stopPropagation()">
+          <textarea
+            #noteArea
+            placeholder="Escribe un comentario…"
+            [value]="any(a).text"
+            (input)="onNoteInput(a, $event)"
+            (keydown)="onNoteKey($event)"
+          ></textarea>
+          <div class="note-actions">
+            <button type="button" class="ghost danger" (click)="store.removeAnnot(a.id)">Eliminar</button>
+            <button type="button" class="solid" (click)="store.editingId.set(null)">Listo</button>
+          </div>
+        </div>
+      }
+    }
+  </div>
+
+  <!-- Decoraciones en el espacio de la página tal y como se ve -->
+  @let wm = store.state().watermark;
+  @if (wm.enabled && wm.text) {
+    <div
+      class="watermark"
+      [style.font-size.px]="wm.size * z"
+      [style.color]="wm.color"
+      [style.opacity]="wm.opacity"
+      [style.transform]="'translate(-50%, -50%) rotate(' + -wm.angle + 'deg)'"
+    >
+      {{ wm.text }}
+    </div>
+  }
+  @let pn = store.state().pageNumbers;
+  @if (pn.enabled && numberLabel()) {
+    <div class="pagenum" [class]="'pagenum pos-' + pn.position" [style.font-size.px]="pn.size * z" [style.color]="pn.color" [style.--m.px]="28 * z">
+      {{ numberLabel() }}
+    </div>
+  }
+</div>
+
+<ng-template #annotTpl let-a let-isDraft="draft">
+  @if (a.type === 'text') {
+    @let t = asText(a);
+    @let editing = editId === a.id;
+    <div
+      class="annot t-text"
+      [attr.data-text-id]="isDraft ? null : a.id"
+      [attr.data-editing]="editing ? 1 : null"
+      [class.sel]="a.id === selId"
+      [class.editing]="editing"
+      [style.left.px]="t.x * z"
+      [style.top.px]="t.y * z"
+      [style.font-family]="FONT_MAP[t.font].css"
+      [style.font-size.px]="t.size * z"
+      [style.font-weight]="t.bold ? 700 : 400"
+      [style.font-style]="t.italic ? 'italic' : 'normal'"
+      [style.text-decoration]="t.underline ? 'underline' : 'none'"
+      [style.color]="t.color"
+      [style.background]="t.bg || 'transparent'"
+      [style.text-align]="t.align"
+      [style.opacity]="t.opacity"
+      (pointerdown)="onAnnotDown($event, a)"
+      (dblclick)="onAnnotDblClick($event, a)"
+    >
+      @if (editing) {
+        <div
+          #editEl
+          class="edit"
+          contenteditable="plaintext-only"
+          spellcheck="true"
+          data-placeholder="Escribe aquí"
+          (input)="onEditInput(t)"
+          (keydown)="onEditKey($event)"
+          (blur)="onEditBlur(t)"
+          (pointerdown)="$event.stopPropagation()"
+        ></div>
+      } @else {
+        <div class="txt" [textContent]="t.text"></div>
+      }
+    </div>
+  } @else {
+    <div
+      class="annot"
+      [class]="'annot t-' + a.type"
+      [class.sel]="a.id === selId"
+      [class.draft]="isDraft"
+      [style.left.px]="a.x * z"
+      [style.top.px]="a.y * z"
+      [style.width.px]="a.w * z"
+      [style.height.px]="a.h * z"
+      [style.opacity]="a.type === 'highlight' ? 1 : a.opacity"
+      (pointerdown)="onAnnotDown($event, a)"
+      (dblclick)="onAnnotDblClick($event, a)"
+    >
+      @switch (a.type) {
+        @case ('rect') {
+          <svg class="fit" [attr.viewBox]="'0 0 ' + a.w + ' ' + a.h" preserveAspectRatio="none">
+            <rect
+              x="0"
+              y="0"
+              [attr.width]="a.w"
+              [attr.height]="a.h"
+              [attr.fill]="any(a).fill || 'none'"
+              [attr.stroke]="any(a).stroke || 'none'"
+              [attr.stroke-width]="any(a).stroke ? any(a).strokeWidth : 0"
+            />
+          </svg>
+        }
+        @case ('ellipse') {
+          <svg class="fit" [attr.viewBox]="'0 0 ' + a.w + ' ' + a.h" preserveAspectRatio="none">
+            <ellipse
+              [attr.cx]="a.w / 2"
+              [attr.cy]="a.h / 2"
+              [attr.rx]="a.w / 2"
+              [attr.ry]="a.h / 2"
+              [attr.fill]="any(a).fill || 'none'"
+              [attr.stroke]="any(a).stroke || 'none'"
+              [attr.stroke-width]="any(a).stroke ? any(a).strokeWidth : 0"
+            />
+          </svg>
+        }
+        @case ('ink') {
+          <svg class="fit" [attr.viewBox]="'0 0 ' + a.w + ' ' + a.h" preserveAspectRatio="none">
+            <path [attr.d]="pathD(a)" fill="none" [attr.stroke]="any(a).stroke" [attr.stroke-width]="any(a).strokeWidth" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        }
+        @case ('line') {
+          <svg class="fit" [attr.viewBox]="'0 0 ' + a.w + ' ' + a.h" preserveAspectRatio="none">
+            <path class="hitpath" [attr.d]="pathD(a)" />
+            <path [attr.d]="pathD(a)" fill="none" [attr.stroke]="any(a).stroke" [attr.stroke-width]="any(a).strokeWidth" stroke-linecap="round" />
+          </svg>
+        }
+        @case ('arrow') {
+          <svg class="fit" [attr.viewBox]="'0 0 ' + a.w + ' ' + a.h" preserveAspectRatio="none">
+            <path class="hitpath" [attr.d]="pathD(a)" />
+            <path [attr.d]="pathD(a)" fill="none" [attr.stroke]="any(a).stroke" [attr.stroke-width]="any(a).strokeWidth" stroke-linecap="round" />
+            <path [attr.d]="arrowD(a)" [attr.fill]="any(a).stroke" />
+          </svg>
+        }
+        @case ('highlight') {
+          <div class="hl" [class]="'hl hl-' + any(a).mode" [style.background]="any(a).color" [style.--o]="a.opacity"></div>
+        }
+        @case ('image') {
+          <img [src]="any(a).src" alt="" draggable="false" />
+        }
+        @case ('note') {
+          <div class="note-icon" [style.background]="any(a).color" [title]="any(a).text || 'Comentario'">
+            <app-icon name="note" [size]="14" [stroke]="2" />
+          </div>
+        }
+        @case ('stamp') {
+          <svg class="fit" [attr.viewBox]="'0 0 ' + a.w + ' ' + a.h" preserveAspectRatio="none">
+            <path [attr.d]="stampPath(a)" fill="none" [attr.stroke]="any(a).color" [attr.stroke-width]="Math.max(1.5, a.h * 0.07)" />
+            <text
+              [attr.x]="a.w / 2"
+              [attr.y]="a.h / 2 + stampFont(a) * 0.36"
+              text-anchor="middle"
+              font-family="Helvetica, Arial, sans-serif"
+              font-weight="700"
+              [attr.font-size]="stampFont(a)"
+              [attr.fill]="any(a).color"
+            >
+              {{ any(a).label }}
+            </text>
+          </svg>
+        }
+        @case ('symbol') {
+          <svg class="fit" [attr.viewBox]="'0 0 ' + a.w + ' ' + a.h" preserveAspectRatio="none">
+            @if (any(a).kind === 'dot') {
+              <ellipse [attr.cx]="a.w / 2" [attr.cy]="a.h / 2" [attr.rx]="a.w * 0.32" [attr.ry]="a.h * 0.32" [attr.fill]="any(a).color" />
+            } @else {
+              @for (d of symbolD(any(a).kind, a.w, a.h); track $index) {
+                <path [attr.d]="d" fill="none" [attr.stroke]="any(a).color" [attr.stroke-width]="Math.min(a.w, a.h) * 0.13" stroke-linecap="round" stroke-linejoin="round" />
+              }
+            }
+          </svg>
+        }
+      }
+    </div>
+  }
+</ng-template>

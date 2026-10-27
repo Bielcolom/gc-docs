@@ -1,0 +1,211 @@
+{
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "version": 1,
+  "cli": {
+    "packageManager": "npm"
+  },
+  "newProjectRoot": "projects",
+  "projects": {
+    "gc-docs": {
+      "projectType": "application",
+      "schematics": {
+        "@schematics/angular:class": {
+          "skipTests": true
+        },
+        "@schematics/angular:component": {
+          "skipTests": true
+        },
+        "@schematics/angular:directive": {
+          "skipTests": true
+        },
+        "@schematics/angular:guard": {
+          "skipTests": true
+        },
+        "@schematics/angular:interceptor": {
+          "skipTests": true
+        },
+        "@schematics/angular:pipe": {
+          "skipTests": true
+        },
+        "@schematics/angular:resolver": {
+          "skipTests": true
+        },
+        "@schematics/angular:service": {
+          "skipTests": true
+        }
+      },
+      "root": "",
+      "sourceRoot": "src",
+      "prefix": "app",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:application",
+          "options": {
+            "browser": "src/main.ts",
+            "tsConfig": "tsconfig.app.json",
+            "assets": [
+              {
+                "glob": "**/*",
+                "input": "public"
+              },
+              {
+                "glob": "pdf.worker.min.mjs",
+                "input": "node_modules/pdfjs-dist/build",
+                "output": "pdfjs"
+              },
+              {
+                "glob": "**/*",
+                "input": "node_modules/pdfjs-dist/cmaps",
+                "output": "pdfjs/cmaps"
+              },
+              {
+                "glob": "**/*",
+                "input": "node_modules/pdfjs-dist/standard_fonts",
+                "output": "pdfjs/standard_fonts"
+              },
+              {
+                "glob": "**/*",
+                "input": "node_modules/pdfjs-dist/wasm",
+                "output": "pdfjs/wasm"
+              },
+              {
+                "glob": "**/*",
+                "input": "node_modules/pdfjs-dist/iccs",
+                "output": "pdfjs/iccs"
+              },
+              {
+                "glob": "*.ttf",
+                "input": "node_modules/@expo-google-fonts/roboto/400Regular",
+                "output": "fonts"
+              },
+              {
+                "glob": "*.ttf",
+                "input": "node_modules/@expo-google-fonts/roboto/700Bold",
+                "output": "fonts"
+              },
+              {
+                "glob": "*.ttf",
+                "input": "node_modules/@expo-google-fonts/roboto/400Regular_Italic",
+                "output": "fonts"
+              },
+              {
+                "glob": "*.ttf",
+                "input": "node_modules/@expo-google-fonts/roboto/700Bold_Italic",
+                "output": "fonts"
+              },
+              {
+                "glob": "*.ttf",
+                "input": "node_modules/@expo-google-fonts/lora/400Regular",
+                "output": "fonts"
+              },
+              {
+                "glob": "*.ttf",
+                "input": "node_modules/@expo-google-fonts/lora/700Bold",
+                "output": "fonts"
+              },
+              {
+                "glob": "*.ttf",
+                "input": "node_modules/@expo-google-fonts/lora/400Regular_Italic",
+                "output": "fonts"
+              },
+              {
+                "glob": "*.ttf",
+                "input": "node_modules/@expo-google-fonts/lora/700Bold_Italic",
+                "output": "fonts"
+              },
+              {
+                "glob": "*.ttf",
+                "input": "node_modules/@expo-google-fonts/roboto-mono/400Regular",
+                "output": "fonts"
+              },
+              {
+                "glob": "*.ttf",
+                "input": "node_modules/@expo-google-fonts/roboto-mono/700Bold",
+                "output": "fonts"
+              },
+              {
+                "glob": "*.ttf",
+                "input": "node_modules/@expo-google-fonts/roboto-mono/400Regular_Italic",
+                "output": "fonts"
+              },
+              {
+                "glob": "*.ttf",
+                "input": "node_modules/@expo-google-fonts/roboto-mono/700Bold_Italic",
+                "output": "fonts"
+              },
+              {
+                "glob": "*.ttf",
+                "input": "node_modules/@expo-google-fonts/dancing-script/400Regular",
+                "output": "fonts"
+              },
+              {
+                "glob": "*.ttf",
+                "input": "node_modules/@expo-google-fonts/dancing-script/700Bold",
+                "output": "fonts"
+              },
+              {
+                "glob": "*.ttf",
+                "input": "node_modules/@expo-google-fonts/great-vibes/400Regular",
+                "output": "fonts"
+              },
+              {
+                "glob": "*.ttf",
+                "input": "node_modules/@expo-google-fonts/caveat/400Regular",
+                "output": "fonts"
+              },
+              {
+                "glob": "*.ttf",
+                "input": "node_modules/@expo-google-fonts/caveat/700Bold",
+                "output": "fonts"
+              }
+            ],
+            "styles": [
+              "node_modules/@fontsource-variable/bricolage-grotesque/opsz.css",
+              "node_modules/@fontsource-variable/schibsted-grotesk/wght.css",
+              "src/styles.css"
+            ],
+            "allowedCommonJsDependencies": [
+              "jszip",
+              "pako"
+            ]
+          },
+          "configurations": {
+            "production": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "3MB",
+                  "maximumError": "5MB"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "16kB",
+                  "maximumError": "32kB"
+                }
+              ],
+              "outputHashing": "all"
+            },
+            "development": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve": {
+          "builder": "@angular/build:dev-server",
+          "configurations": {
+            "production": {
+              "buildTarget": "gc-docs:build:production"
+            },
+            "development": {
+              "buildTarget": "gc-docs:build:development"
+            }
+          },
+          "defaultConfiguration": "development"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,200 @@
+/*
+ * GC Docs — sistema visual
+ * Mesa de trabajo gris salvia, hojas blancas, tinta azul marino y un único acento:
+ * el amarillo del rotulador fluorescente, que marca lo que está activo.
+ */
+
+:root {
+  --desk: #e3e6e0;
+  --desk-dot: rgba(22, 38, 58, 0.07);
+  --surface: #fbfbf8;
+  --surface-2: #f1f3ef;
+  --ink: #16263a;
+  --ink-2: #4c5866;
+  --ink-3: #7a8592;
+  --line: #dde1da;
+  --line-soft: #e9ece6;
+  --line-strong: #c9cfc7;
+  --marker: #ffe14d;
+  --marker-deep: #e0b400;
+  --marker-soft: #fff5c2;
+  --sel: #2a6fdb;
+  --danger: #b3261e;
+  --focus: #16263a;
+  --focus-soft: rgba(22, 38, 58, 0.14);
+  --sheet-edge: rgba(22, 38, 58, 0.1);
+  --sheet-edge-strong: rgba(22, 38, 58, 0.22);
+  --tooltip: #16263a;
+  --tooltip-ink: #f5f6f2;
+  --scrim: rgba(18, 26, 36, 0.42);
+  --shadow-pop: 0 12px 32px -10px rgba(22, 38, 58, 0.35), 0 2px 6px rgba(22, 38, 58, 0.08);
+
+  --ui: 'Schibsted Grotesk Variable', 'Schibsted Grotesk', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --display: 'Bricolage Grotesque Variable', 'Bricolage Grotesque', 'Schibsted Grotesk Variable', system-ui, sans-serif;
+
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  --desk: #151a1f;
+  --desk-dot: rgba(255, 255, 255, 0.045);
+  --surface: #1d232a;
+  --surface-2: #262d35;
+  --ink: #e9edf0;
+  --ink-2: #a9b3bd;
+  --ink-3: #7f8a96;
+  --line: #303841;
+  --line-soft: #2a3139;
+  --line-strong: #3c4550;
+  --marker-soft: rgba(255, 225, 77, 0.14);
+  --sel: #5b9bff;
+  --danger: #ff7b70;
+  --focus: #e9edf0;
+  --focus-soft: rgba(233, 237, 240, 0.16);
+  --sheet-edge: rgba(0, 0, 0, 0.4);
+  --sheet-edge-strong: rgba(255, 255, 255, 0.25);
+  --tooltip: #f1f3ef;
+  --tooltip-ink: #16263a;
+  --scrim: rgba(0, 0, 0, 0.55);
+  --shadow-pop: 0 14px 36px -10px rgba(0, 0, 0, 0.6), 0 2px 6px rgba(0, 0, 0, 0.3);
+  color-scheme: dark;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: var(--ui);
+  font-size: 14px;
+  color: var(--ink);
+  background: var(--desk);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow: hidden;
+}
+
+button {
+  font-family: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* ---------- Botones compartidos ---------- */
+.solid {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 9px;
+  background: var(--ink);
+  color: var(--surface);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: transform 0.08s, box-shadow 0.15s;
+}
+.solid:hover {
+  box-shadow: 0 0 0 3px var(--focus-soft);
+}
+.solid:active {
+  transform: translateY(1px);
+}
+.solid:disabled {
+  opacity: 0.4;
+  cursor: default;
+  box-shadow: none;
+}
+.solid.big {
+  height: 48px;
+  padding: 0 22px;
+  font-size: 16px;
+  border-radius: 11px;
+  background: #16263a;
+  color: #fffefb;
+}
+
+.ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 36px;
+  padding: 0 14px;
+  border: 1px solid var(--line-strong);
+  border-radius: 9px;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.ghost:hover {
+  background: var(--surface-2);
+}
+.ghost.danger {
+  color: var(--danger);
+}
+
+.icon-btn {
+  width: 36px;
+  height: 36px;
+  display: inline-grid;
+  place-items: center;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--ink-2);
+  cursor: pointer;
+  flex: none;
+}
+.icon-btn:hover:not(:disabled) {
+  background: var(--surface-2);
+  color: var(--ink);
+}
+.icon-btn.on {
+  color: var(--ink);
+  background: var(--surface-2);
+}
+.icon-btn:disabled {
+  opacity: 0.32;
+  cursor: default;
+}
+
+::-webkit-scrollbar {
+  width: 11px;
+  height: 11px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--line-strong);
+  border-radius: 99px;
+  border: 3px solid transparent;
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

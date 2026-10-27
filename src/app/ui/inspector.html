@@ -1,0 +1,260 @@
+@let a = sel();
+@let k = kind();
+
+<header class="head">
+  <div>
+    <h2>{{ title() }}</h2>
+    <p class="sub">
+      @if (a) {
+        Página {{ pageNumber() }}
+      } @else if (k) {
+        Estilo para lo próximo que añadas
+      } @else {
+        {{ store.pages().length }} {{ store.pages().length === 1 ? 'página' : 'páginas' }} · {{ editCount() }} {{ editCount() === 1 ? 'cambio' : 'cambios' }}
+      }
+    </p>
+  </div>
+  @if (a) {
+    <button type="button" class="icon-btn" title="Deseleccionar (Esc)" (click)="store.selectedId.set(null)"><app-icon name="close" [size]="16" /></button>
+  }
+</header>
+
+<div class="body">
+  @switch (k) {
+    @case ('editText') {
+      <div class="tip-card">
+        <app-icon name="editText" [size]="22" />
+        <p>Los textos del PDF aparecen recuadrados. Haz clic en uno para reescribirlo: se mantiene la posición, el tamaño y el color.</p>
+      </div>
+      <p class="fine">Si el texto lleva caracteres especiales que la fuente original no admite, se usa una fuente equivalente incrustada.</p>
+    }
+    @case ('whiteout') {
+      <div class="tip-card">
+        <app-icon name="whiteout" [size]="22" />
+        <p>Arrastra sobre cualquier zona para taparla con blanco, como un corrector. Después puedes escribir encima con «Añadir texto».</p>
+      </div>
+    }
+
+    @case ('text') {
+      <section>
+        <label class="lbl" for="font">Fuente</label>
+        <select id="font" class="input" [value]="font()" (change)="setFont(val($event))">
+          @for (g of fontGroups; track g) {
+            <optgroup [label]="g">
+              @for (f of FONTS; track f.id) {
+                @if (f.group === g) {
+                  <option [value]="f.id" [selected]="font() === f.id">{{ f.label }}</option>
+                }
+              }
+            </optgroup>
+          }
+        </select>
+      </section>
+      <section class="split">
+        <div>
+          <label class="lbl" for="size">Tamaño</label>
+          <div class="stepper">
+            <button type="button" aria-label="Reducir" (click)="setNum('size', num('size') - 1)"><app-icon name="minus" [size]="14" /></button>
+            <input id="size" type="number" min="4" max="300" step="0.5" [value]="num('size')" (change)="setNum('size', numVal($event))" />
+            <button type="button" aria-label="Aumentar" (click)="setNum('size', num('size') + 1)"><app-icon name="plus" [size]="14" /></button>
+          </div>
+        </div>
+        <div>
+          <span class="lbl">Estilo</span>
+          <div class="seg">
+            <button type="button" [class.on]="flag('bold')" (click)="toggle('bold')" title="Negrita (Ctrl+B)" aria-label="Negrita"><app-icon name="bold" [size]="15" [stroke]="2.2" /></button>
+            <button type="button" [class.on]="flag('italic')" (click)="toggle('italic')" title="Cursiva (Ctrl+I)" aria-label="Cursiva"><app-icon name="italic" [size]="15" /></button>
+            @if (a) {
+              <button type="button" [class.on]="flag('underline')" (click)="toggle('underline')" title="Subrayado (Ctrl+U)" aria-label="Subrayado"><app-icon name="underline" [size]="15" /></button>
+            }
+          </div>
+        </div>
+      </section>
+      @if (asText(a); as t) {
+        <section>
+          <span class="lbl">Alineación</span>
+          <div class="seg wide">
+            <button type="button" [class.on]="t.align === 'left'" (click)="patch({ align: 'left' })" aria-label="Izquierda"><app-icon name="alignLeft" [size]="15" /></button>
+            <button type="button" [class.on]="t.align === 'center'" (click)="patch({ align: 'center' })" aria-label="Centro"><app-icon name="alignCenter" [size]="15" /></button>
+            <button type="button" [class.on]="t.align === 'right'" (click)="patch({ align: 'right' })" aria-label="Derecha"><app-icon name="alignRight" [size]="15" /></button>
+          </div>
+        </section>
+      }
+      <section>
+        <span class="lbl">Color</span>
+        <app-swatches [colors]="PALETTE" [value]="color()" (pick)="setColor($event)" />
+      </section>
+      @if (asText(a); as t) {
+        <section>
+          <span class="lbl">Fondo de la caja</span>
+          <app-swatches [colors]="PALETTE" [value]="t.bg" [allowNone]="true" (pick)="patch({ bg: $event })" />
+        </section>
+        @if (t.cover) {
+          <section class="card">
+            <span class="lbl">Color que tapa el texto original</span>
+            <app-swatches [colors]="['#ffffff', '#f4f1e8', '#e9eef5', '#111418']" [value]="t.cover.color" (pick)="setCoverColor($event)" />
+            <button type="button" class="link-btn" (click)="restoreOriginal()"><app-icon name="undo" [size]="14" /> Restaurar el texto original</button>
+          </section>
+        }
+      }
+    }
+
+    @case ('shape') {
+      <section>
+        <span class="lbl">Borde</span>
+        <app-swatches [colors]="PALETTE" [value]="stroke()" [allowNone]="!!a" (pick)="setStroke($event)" />
+      </section>
+      <section>
+        <span class="lbl">Relleno</span>
+        <app-swatches [colors]="PALETTE" [value]="fill()" [allowNone]="true" (pick)="setFill($event)" />
+      </section>
+      <ng-container *ngTemplateOutlet="width" />
+    }
+
+    @case ('path') {
+      <section>
+        <span class="lbl">Color</span>
+        <app-swatches [colors]="PALETTE" [value]="color()" (pick)="setColor($event)" />
+      </section>
+      <ng-container *ngTemplateOutlet="width" />
+    }
+
+    @case ('highlight') {
+      <section>
+        <span class="lbl">Tipo</span>
+        <div class="seg wide">
+          <button type="button" [class.on]="highlightMode() === 'highlight'" (click)="setHighlightMode('highlight')">Resaltar</button>
+          <button type="button" [class.on]="highlightMode() === 'underline'" (click)="setHighlightMode('underline')">Subrayar</button>
+          <button type="button" [class.on]="highlightMode() === 'strike'" (click)="setHighlightMode('strike')">Tachar</button>
+        </div>
+      </section>
+      <section>
+        <span class="lbl">Color</span>
+        <app-swatches [colors]="highlightMode() === 'highlight' ? HIGHLIGHT_COLORS : PALETTE" [value]="color()" (pick)="setColor($event)" />
+      </section>
+      @if (!a) {
+        <p class="fine">Arrastra sobre el texto que quieras marcar. La herramienta sigue activa para que marques varias zonas seguidas.</p>
+      }
+    }
+
+    @case ('note') {
+      <section>
+        <span class="lbl">Color</span>
+        <app-swatches [colors]="['#f5c518', '#ff9f43', '#7fd8ff', '#9cf08c', '#ffa8d5']" [value]="color()" (pick)="setColor($event)" />
+      </section>
+      @if (a) {
+        <section>
+          <label class="lbl" for="note">Comentario</label>
+          <textarea id="note" class="input area" [value]="$any(a).text" (input)="patch({ text: val($event) }, 'text')" (keydown)="$event.stopPropagation()" placeholder="Escribe un comentario…"></textarea>
+        </section>
+      } @else {
+        <p class="fine">Haz clic en la página para dejar un comentario. Se guarda como nota de PDF estándar, visible en cualquier lector.</p>
+      }
+    }
+
+    @case ('stamp') {
+      <section>
+        <label class="lbl" for="stamp">Texto</label>
+        <input id="stamp" class="input" [value]="$any(a).label" (input)="patch({ label: val($event).toUpperCase() }, 'label')" (keydown)="$event.stopPropagation()" />
+      </section>
+      <section>
+        <span class="lbl">Color</span>
+        <app-swatches [colors]="STAMP_COLORS" [value]="color()" (pick)="setColor($event)" />
+      </section>
+    }
+
+    @case ('symbol') {
+      <section>
+        <span class="lbl">Marca</span>
+        <div class="seg wide">
+          <button type="button" [class.on]="symbolKind() === 'check'" (click)="setSymbol('check')" aria-label="Visto bueno"><app-icon name="check" [size]="16" [stroke]="2.6" /></button>
+          <button type="button" [class.on]="symbolKind() === 'cross'" (click)="setSymbol('cross')" aria-label="Aspa"><app-icon name="cross" [size]="16" [stroke]="2.6" /></button>
+          <button type="button" [class.on]="symbolKind() === 'dot'" (click)="setSymbol('dot')" aria-label="Punto"><app-icon name="dot" [size]="16" [stroke]="4" /></button>
+        </div>
+      </section>
+      <section>
+        <span class="lbl">Color</span>
+        <app-swatches [colors]="PALETTE" [value]="color()" (pick)="setColor($event)" />
+      </section>
+      @if (a) {
+        <section>
+          <label class="lbl" for="symsize">Tamaño <output>{{ a.w | number: '1.0-0' }} pt</output></label>
+          <input id="symsize" type="range" min="6" max="80" step="1" [value]="a.w" (input)="setNum('size', numVal($event))" />
+        </section>
+      } @else {
+        <p class="fine">Haz clic donde quieras marcar casillas de un formulario impreso.</p>
+      }
+    }
+  }
+
+  @if (k && k !== 'editText' && k !== 'whiteout') {
+    <section>
+      <label class="lbl" for="opacity">Opacidad <output>{{ num('opacity') * 100 | number: '1.0-0' }} %</output></label>
+      <input id="opacity" type="range" min="0.05" max="1" step="0.05" [value]="num('opacity')" (input)="setNum('opacity', numVal($event))" />
+    </section>
+  }
+
+  @if (a) {
+    <section class="row-actions">
+      <button type="button" class="ghost" (click)="store.bringToFront(a.id, true)" title="Traer al frente"><app-icon name="front" [size]="16" /> Delante</button>
+      <button type="button" class="ghost" (click)="store.bringToFront(a.id, false)" title="Enviar atrás"><app-icon name="back" [size]="16" /> Detrás</button>
+      <button type="button" class="ghost" (click)="store.duplicateAnnot(a.id)" title="Duplicar (Ctrl+D)"><app-icon name="copy" [size]="16" /> Duplicar</button>
+      <button type="button" class="ghost danger" (click)="store.removeAnnot(a.id)" title="Eliminar (Supr)"><app-icon name="trash" [size]="16" /> Eliminar</button>
+    </section>
+  }
+
+  @if (!a && !k) {
+    <!-- Panel del documento -->
+    <section>
+      <h3>Página {{ pageNumber() }}</h3>
+      <div class="grid">
+        <button type="button" class="tile" (click)="actions.rotate(-90)"><app-icon name="rotateCcw" /> Girar izq.</button>
+        <button type="button" class="tile" (click)="actions.rotate(90)"><app-icon name="rotateCw" /> Girar der.</button>
+        <button type="button" class="tile" (click)="actions.duplicateTarget()"><app-icon name="copy" /> Duplicar</button>
+        <button type="button" class="tile danger" (click)="actions.deleteTarget()"><app-icon name="trash" /> Eliminar</button>
+        <button type="button" class="tile" (click)="actions.insertBlank()"><app-icon name="file" /> Hoja en blanco</button>
+        <button type="button" class="tile" (click)="actions.insertFiles()"><app-icon name="filePlus" /> Insertar archivo</button>
+      </div>
+    </section>
+
+    <section>
+      <h3>Organizar</h3>
+      <div class="list">
+        <button type="button" (click)="actions.insertFiles(store.pages().length)"><app-icon name="filePlus" /><span><b>Unir PDFs</b><small>Añade otros PDFs o imágenes al final</small></span></button>
+        <button type="button" (click)="ui.open('split')"><app-icon name="split" /><span><b>Dividir</b><small>Por rangos o cada cierto número de páginas</small></span></button>
+        <button type="button" (click)="actions.extractTarget()"><app-icon name="extract" /><span><b>Extraer páginas</b><small>Descarga la página actual o las seleccionadas</small></span></button>
+        <button type="button" (click)="actions.rotateAll(90)"><app-icon name="rotateCw" /><span><b>Girar todas</b><small>90° en el sentido del reloj</small></span></button>
+        <button type="button" (click)="store.reversePages()"><app-icon name="reverse" /><span><b>Invertir orden</b><small>La última página pasa a ser la primera</small></span></button>
+      </div>
+    </section>
+
+    <section>
+      <h3>Acabado</h3>
+      <div class="list">
+        <button type="button" (click)="ui.open('watermark')">
+          <app-icon name="watermark" /><span><b>Marca de agua</b><small>{{ store.state().watermark.enabled ? 'Activada: «' + store.state().watermark.text + '»' : 'Texto en diagonal en todas las páginas' }}</small></span>
+        </button>
+        <button type="button" (click)="ui.open('numbers')">
+          <app-icon name="hash" /><span><b>Numerar páginas</b><small>{{ store.state().pageNumbers.enabled ? 'Activada' : 'Añade el número a pie de página' }}</small></span>
+        </button>
+        <button type="button" (click)="ui.open('meta')"><app-icon name="info" /><span><b>Propiedades</b><small>Título, autor y palabras clave</small></span></button>
+      </div>
+    </section>
+
+    <section>
+      <h3>Exportar</h3>
+      <div class="list">
+        <button type="button" (click)="actions.download()"><app-icon name="download" /><span><b>Descargar PDF</b><small>Con todos los cambios aplicados</small></span></button>
+        <button type="button" (click)="ui.open('images')"><app-icon name="image" /><span><b>Guardar como imágenes</b><small>Un PNG por página</small></span></button>
+        <button type="button" (click)="actions.print()"><app-icon name="printer" /><span><b>Imprimir</b></span></button>
+      </div>
+    </section>
+  }
+</div>
+
+<ng-template #width>
+  <section>
+    <label class="lbl" for="sw">Grosor <output>{{ num('strokeWidth') | number: '1.0-1' }} pt</output></label>
+    <input id="sw" type="range" min="0.5" max="20" step="0.5" [value]="num('strokeWidth')" (input)="setNum('strokeWidth', numVal($event))" />
+  </section>
+</ng-template>
