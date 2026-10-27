@@ -1,5 +1,7 @@
 # GC Docs · Editor de PDF
 
+[![CI](https://github.com/Bielcolom/gc-docs/actions/workflows/ci.yml/badge.svg)](https://github.com/Bielcolom/gc-docs/actions/workflows/ci.yml)
+
 Editor de PDF completo que funciona en el navegador. Abre un PDF, cambia su texto, fírmalo, rellena sus campos, ordena sus páginas y descárgalo. **Todo se procesa en tu equipo**: los archivos nunca se suben a ningún servidor.
 
 **Demo:** https://bielcolom.github.io/gc-docs/
@@ -11,11 +13,13 @@ Editor de PDF completo que funciona en el navegador. Abre un PDF, cambia su text
 ## Funcionalidades
 
 ### Editar
+
 - **Editar el texto original del PDF.** Con la herramienta «Editar texto» (`E`) los textos del documento aparecen recuadrados; haz clic en uno y reescríbelo. Se conserva la posición, el tamaño y el color, y se detecta la fuente más parecida (Helvetica/Arial, Times o Courier, con negrita y cursiva).
 - **Añadir texto** con 9 fuentes (clásicas, modernas y manuscritas), tamaño, negrita, cursiva, subrayado, alineación, color y fondo. Admite cualquier carácter Unicode (ñ, tildes, Ł, Ž…).
 - **Tapar** zonas como con un corrector, para escribir encima.
 
 ### Anotar
+
 - Resaltar, subrayar y tachar.
 - Dibujo a mano alzada.
 - Rectángulos, elipses, líneas y flechas, con borde, relleno, grosor y opacidad.
@@ -25,10 +29,12 @@ Editor de PDF completo que funciona en el navegador. Abre un PDF, cambia su text
 - Imágenes: desde archivo, arrastrándolas a la página o pegándolas con `Ctrl+V`.
 
 ### Firmar y rellenar
+
 - **Firma** dibujada, escrita con tipografía manuscrita o subida desde una foto (con eliminación automática del fondo blanco). Las firmas se recuerdan para la próxima vez.
 - **Formularios PDF:** los campos de texto, casillas, botones de opción y desplegables se vuelven editables.
 
 ### Organizar páginas y documentos
+
 - **Vista «Organizar»** (`G`) a pantalla completa con todas las páginas en cuadrícula y tamaño de miniatura ajustable.
 - Arrastrar y soltar una o muchas páginas a la vez, con desplazamiento automático y animación del cambio de orden. En móvil se arrastra desde el asa de cada miniatura.
 - Selección múltiple con `Ctrl`/`⇧` + clic, con un recuadro de selección o con `Ctrl+A`.
@@ -44,6 +50,7 @@ Editor de PDF completo que funciona en el navegador. Abre un PDF, cambia su text
 - Invertir el orden.
 
 ### Acabado y exportación
+
 - Marca de agua en todas las páginas (texto, tamaño, color, opacidad e inclinación).
 - Numeración de páginas con varios formatos y posiciones.
 - Propiedades del documento: título, autor, asunto y palabras clave.
@@ -51,6 +58,7 @@ Editor de PDF completo que funciona en el navegador. Abre un PDF, cambia su text
 - Abre PDFs protegidos con contraseña.
 
 ### Comodidad
+
 - Deshacer y rehacer ilimitado (`Ctrl+Z` / `Ctrl+⇧+Z`).
 - Búsqueda de texto sin distinguir mayúsculas ni tildes (`Ctrl+F`).
 - Zoom con `Ctrl` + rueda, ajuste al ancho o a la página.
@@ -69,52 +77,49 @@ Es el mismo enfoque que usan la mayoría de editores web. El texto original sigu
 
 ## Tecnología
 
-- **[Angular 22](https://angular.dev)** con componentes *standalone*, **signals** y sin Zone.js.
+- **[Angular 22](https://angular.dev)**: componentes _standalone_, **signals**, sin Zone.js, rutas con _lazy loading_, Reactive Forms tipados y **Angular CDK** (diálogos, menús y arrastrar y soltar).
 - **pdf.js** para mostrar las páginas, extraer texto y leer formularios.
-- **pdf-lib** + **fontkit** para escribir el PDF final.
-- **JSZip** para descargar varios archivos a la vez.
+- **pdf-lib** + **fontkit** para escribir el PDF final y **JSZip** para descargar varios archivos.
+  Estas librerías se cargan solo cuando hacen falta: la página de inicio pesa unos 140 kB comprimida.
 - Fuentes incluidas en el proyecto (Roboto, Lora, Roboto Mono, Dancing Script, Great Vibes, Caveat, Bricolage Grotesque y Schibsted Grotesk): la app no depende de servicios externos.
+- Calidad: TypeScript estricto, **ESLint** (con reglas de accesibilidad), **Prettier**, tests con **Vitest**, _git hooks_ con Husky y commitlint, y CI/CD con GitHub Actions.
 
 ## Estructura del proyecto
 
 ```
 src/app/
-├── app.ts / .html / .css      Estructura general, barra superior y atajos de teclado
-├── core/                      Lógica sin interfaz
-│   ├── models.ts              Tipos: páginas, anotaciones, ajustes del documento
-│   ├── document.store.ts      Estado con signals + historial de deshacer/rehacer
-│   ├── pdfjs.ts               Carga de PDFs con pdf.js
-│   ├── text-extract.ts        Extracción del texto en líneas editables
-│   ├── exporter.ts            Generación del PDF final con pdf-lib
-│   ├── export-tools.ts        Dividir, imágenes PNG e impresión
-│   ├── fonts.ts               Catálogo de fuentes y métricas
-│   └── actions.ts / util.ts   Utilidades compartidas
-└── ui/                        Componentes
-    ├── welcome                Pantalla de inicio
-    ├── viewer / page-view     Visor y capa interactiva de cada página
-    ├── tool-rail              Barra de herramientas
-    ├── sidebar / thumb        Miniaturas y búsqueda
-    ├── inspector              Panel de propiedades
-    ├── organizer              Vista de organización en cuadrícula
-    ├── dialogs                Firma, sellos, marca de agua, numeración, dividir…
-    └── signature-pad          Lienzo de firma
+├── core/          Lógica sin interfaz: modelos, estado (stores con signals), lectura y
+│                  escritura de PDF, servicios, utilidades puras, tokens y guards
+├── shared/        Componentes, directivas y pipes reutilizables
+├── layout/        Marco de las pantallas de trabajo (barra superior)
+└── features/
+    ├── welcome/   Pantalla de inicio
+    ├── editor/    Visor, herramientas, panel lateral e inspector
+    ├── organizer/ Cuadrícula para ordenar páginas y documentos
+    └── dialogs/   Firma, sellos, marca de agua, numeración, dividir…
 ```
 
-Todas las anotaciones se guardan en el «espacio base» de cada página (puntos PDF, origen arriba a la izquierda). Al exportar se convierten al sistema de coordenadas del PDF con la matriz de transformación de pdf.js, lo que permite que funcionen igual en páginas giradas.
+La organización por capas, el flujo de datos, los sistemas de coordenadas y las convenciones
+se explican en **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)**.
 
 ## Desarrollo
 
-Necesitas Node.js 20.19 o superior.
+Necesitas Node.js 22.12 o superior.
 
 ```bash
-npm install
+npm install        # dependencias + git hooks
 npm start          # servidor de desarrollo en http://localhost:4200
-npm run build      # compilación de producción en dist/gc-docs/browser
+npm test           # tests unitarios
+npm run check      # lint, formato, tests y build (lo mismo que la CI)
 ```
+
+Todos los scripts, el flujo de ramas y las convenciones de código están en
+**[CONTRIBUTING.md](CONTRIBUTING.md)**.
 
 ## Publicación
 
-Cada `push` a `main` compila la app y la publica en GitHub Pages mediante el flujo `.github/workflows/deploy.yml`.
+La CI (`.github/workflows/ci.yml`) ejecuta lint, formato, tests y compilación en cada pull request.
+Cada `push` a `main` que pasa esas comprobaciones se publica en GitHub Pages.
 
 ## Licencia
 
