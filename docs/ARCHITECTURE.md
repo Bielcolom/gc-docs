@@ -177,15 +177,21 @@ en tres pasos independientes (y probados por separado):
 ```
 pdf-page-reader   pdf.js → líneas con formato (fuente, negrita, color muestreado) e imágenes recortadas
        │
-layout            orden de lectura (corte XY: columnas y filas), párrafos, títulos, márgenes
-       │
+layout            cabecera y pie (running-content), orden de lectura (corte XY: columnas y filas),
+       │          párrafos, títulos y márgenes
 docx-writer       docx → .docx con lo que Google Docs importa bien
 ```
 
+**Cabecera y pie** (`running-content.ts`): son los elementos de las franjas superior e inferior que
+se repiten en el mismo sitio en al menos la mitad de las páginas (con una sola página, los que
+quedan muy cerca del borde y bien separados del texto). Pasan a la cabecera y el pie del .docx.
+Los números que avanzan con la página se escriben como campos de página y de total de páginas, y si
+la primera página no los lleva se trata como portada. Una franja de color con texto encima se
+descarta y se queda el texto.
+
 Decisiones tomadas por Google Docs: un único tamaño de página con saltos manuales, interlineado
 múltiple (no exacto), títulos con los estilos `Heading 1–3`, fuentes que Docs tiene (o la estándar
-más parecida) e imágenes en línea. Los números de página se quitan porque en un documento que
-fluye dejan de cuadrar.
+más parecida), texto legible sobre blanco e imágenes en línea.
 
 ## Rendimiento
 

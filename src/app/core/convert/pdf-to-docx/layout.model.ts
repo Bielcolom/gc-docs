@@ -17,6 +17,11 @@ export interface StyledRun {
   readonly italic: boolean;
   /** Color en hexadecimal sin `#` (p. ej. "000000"). */
   readonly color: string;
+  /**
+   * Número de página o total de páginas: se escribe como campo, que Google Docs mantiene al día.
+   * `text` guarda el número que se veía en el PDF.
+   */
+  readonly field?: 'page' | 'pages';
 }
 
 export interface StyledLine extends Rect {
@@ -81,6 +86,9 @@ export interface Margins {
   readonly right: number;
   readonly bottom: number;
   readonly left: number;
+  /** Distancia del borde superior a la cabecera y del inferior al pie. */
+  readonly header: number;
+  readonly footer: number;
 }
 
 /** El documento listo para escribir: Google Docs solo admite un tamaño de página por documento. */
@@ -90,4 +98,11 @@ export interface DocumentLayout {
   readonly margins: Margins;
   /** Bloques de cada página del PDF, en orden de lectura. */
   readonly pages: readonly (readonly Block[])[];
+  /** Cabecera y pie que se repiten en las páginas (vacíos si no hay). */
+  readonly header: readonly Block[];
+  readonly footer: readonly Block[];
+  /** La primera página no lleva cabecera ni pie (una portada). */
+  readonly titlePage: boolean;
+  /** Número de la primera página, si la numeración del PDF no empieza en 1. */
+  readonly firstPageNumber: number;
 }

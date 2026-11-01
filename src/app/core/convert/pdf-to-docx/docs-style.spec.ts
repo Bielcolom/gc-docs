@@ -34,8 +34,13 @@ describe('docsTextColor', () => {
     expect(docsTextColor('#b3261e')).toBe('b3261e');
   });
 
-  it('evita el texto blanco, que sin su fondo sería invisible', () => {
+  it('pasa a negro el texto que no se leería sobre blanco (estaba sobre un fondo de color)', () => {
     expect(docsTextColor('#ffffff')).toBe('000000');
+    expect(docsTextColor('#ffbc7e')).toBe('000000');
+  });
+
+  it('conserva los grises claros que aún se leen', () => {
+    expect(docsTextColor('#999999')).toBe('999999');
   });
 });
 

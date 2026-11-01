@@ -61,7 +61,9 @@ Editor de PDF completo que funciona en el navegador. Abre un PDF, cambia su text
 
 - **PDF → Google Docs** (`/convertir`): genera un `.docx` pensado para importarlo en Google Docs, con
   párrafos que fluyen, títulos (Título 1–3), negrita, cursiva, colores, columnas leídas en orden,
-  tablas sencillas como filas con tabuladores e imágenes. Los PDF escaneados se insertan como imagen.
+  tablas sencillas como filas con tabuladores e imágenes. La cabecera y el pie que se repiten pasan a
+  ser la cabecera y el pie del documento, con el número de página como campo. Los PDF escaneados se
+  insertan como imagen.
 - El selector «De ⇄ A» funciona en los dos sentidos; los que aún no existen se muestran como
   «próximamente».
 

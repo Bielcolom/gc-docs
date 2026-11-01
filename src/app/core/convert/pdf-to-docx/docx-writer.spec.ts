@@ -19,16 +19,38 @@ const paragraph = (text: string, overrides: Partial<ParagraphBlock> = {}): Parag
 const layout = (overrides: Partial<DocumentLayout> = {}): DocumentLayout => ({
   pageWidth: 595,
   pageHeight: 842,
-  margins: { top: 72, right: 60, bottom: 36, left: 60 },
+  margins: { top: 72, right: 60, bottom: 36, left: 60, header: 30, footer: 20 },
   pages: [[paragraph('Primera página')], [paragraph('Segunda página')]],
+  header: [],
+  footer: [],
+  titlePage: false,
+  firstPageNumber: 1,
   ...overrides,
 });
 
 async function documentXml(doc: DocumentLayout): Promise<string> {
+  return (await files(doc))['word/document.xml'] ?? '';
+}
+
+/** El contenido XML de cada parte del .docx. */
+async function files(doc: DocumentLayout): Promise<Record<string, string>> {
   const blob = await writeDocx(doc, { title: 'prueba' });
   const zip = await JSZip.loadAsync(await blob.arrayBuffer());
-  return (await zip.file('word/document.xml')?.async('string')) ?? '';
+  const entries = Object.values(zip.files).filter((f) => f.name.endsWith('.xml'));
+  return Object.fromEntries(
+    await Promise.all(entries.map(async (f) => [f.name, await f.async('string')])),
+  );
 }
+
+const pageNumberRun = (field: 'page' | 'pages', text: string) => ({
+  text,
+  field,
+  fontSize: 9,
+  font: 'Arial',
+  bold: false,
+  italic: false,
+  color: '000000',
+});
 
 describe('writeDocx', () => {
   it('escribe el texto y separa las páginas con saltos de página', async () => {
@@ -71,5 +93,48 @@ describe('writeDocx', () => {
   it('usa interlineado múltiple, que es el que entiende Google Docs', async () => {
     const xml = await documentXml(layout({ pages: [[paragraph('a', { lineSpacing: 1.5 })]] }));
     expect(xml).toMatch(/w:line="360" w:lineRule="auto"/);
+  });
+
+  it('escribe la cabecera y el pie como tales, con los campos de página', async () => {
+    const footer = paragraph('', {
+      runs: [
+        {
+          text: 'Página ',
+          fontSize: 9,
+          font: 'Arial',
+          bold: false,
+          italic: false,
+          color: '000000',
+        },
+        pageNumberRun('page', '1'),
+        { text: ' de ', fontSize: 9, font: 'Arial', bold: false, italic: false, color: '000000' },
+        pageNumberRun('pages', '3'),
+      ],
+    });
+    const parts = await files(layout({ header: [paragraph('ACME · Informe')], footer: [footer] }));
+    const document = parts['word/document.xml'];
+    const headerXml = Object.entries(parts).find(([name]) =>
+      /word\/header\d*\.xml/.test(name),
+    )?.[1];
+    const footerXml = Object.entries(parts).find(([name]) =>
+      /word\/footer\d*\.xml/.test(name),
+    )?.[1];
+
+    expect(document).not.toContain('ACME');
+    expect(document).toMatch(/<w:headerReference w:type="default"/);
+    expect(document).toMatch(/<w:pgMar[^>]*w:header="600"[^>]*w:footer="400"/);
+    expect(headerXml).toContain('ACME · Informe');
+    expect(footerXml).toContain('Página ');
+    expect(footerXml).toContain('PAGE');
+    expect(footerXml).toContain('NUMPAGES');
+  });
+
+  it('con portada, deja la primera página sin cabecera ni pie y ajusta la numeración', async () => {
+    const xml = await documentXml(
+      layout({ footer: [paragraph('Pie')], titlePage: true, firstPageNumber: 0 }),
+    );
+    expect(xml).toContain('<w:titlePg/>');
+    expect(xml).toMatch(/<w:footerReference w:type="first"/);
+    expect(xml).toMatch(/<w:pgNumType w:start="0"/);
   });
 });

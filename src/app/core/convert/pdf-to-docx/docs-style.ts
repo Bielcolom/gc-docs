@@ -88,20 +88,28 @@ export function docsFontFamily(realName: string, kind: FontId): string {
 /** Por debajo de esto un color sin apenas tono se trata como negro. */
 const NEAR_BLACK = 0.3;
 const MAX_GREY_SPREAD = 0.1;
-/** Texto tan claro solo se lee sobre un fondo oscuro, que no pasa al documento. */
-const TOO_LIGHT = 0.82;
+/** Con menos contraste que esto sobre blanco, el texto apenas se lee (un gris #999 tiene 2,8). */
+const MIN_CONTRAST_ON_WHITE = 2;
 
 /**
- * Color de texto para el documento, sin `#`. Los casi negros (antialiasing) se quedan en negro y los
- * muy claros también, porque el fondo oscuro sobre el que estaban no se conserva y serían invisibles.
+ * Color de texto para el documento, sin `#`. Los casi negros (antialiasing) se quedan en negro, y
+ * también los que no se leerían sobre blanco: estaban sobre un fondo de color (una franja, un
+ * recuadro) que no pasa al documento.
  */
 export function docsTextColor(hex: string): string {
   const [r, g, b] = hexToRgb01(hex);
   const max = Math.max(r, g, b);
   const spread = max - Math.min(r, g, b);
-  const luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
-  if ((max < NEAR_BLACK && spread < MAX_GREY_SPREAD) || luminance > TOO_LIGHT) return '000000';
+  if (max < NEAR_BLACK && spread < MAX_GREY_SPREAD) return '000000';
+  if (contrastOnWhite(r, g, b) < MIN_CONTRAST_ON_WHITE) return '000000';
   return hex.replace('#', '').toLowerCase();
+}
+
+/** Contraste WCAG de un color sobre blanco (de 1 a 21). */
+function contrastOnWhite(r: number, g: number, b: number): number {
+  const linear = (c: number) => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
+  const luminance = 0.2126 * linear(r) + 0.7152 * linear(g) + 0.0722 * linear(b);
+  return 1.05 / (luminance + 0.05);
 }
 
 /** Distancia (0–765) por debajo de la cual dos colores muestreados son el mismo. */
