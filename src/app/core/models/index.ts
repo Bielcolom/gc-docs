@@ -1,4 +1,5 @@
 export * from './annotation.model';
+export * from './conversion.model';
 export * from './document-settings.model';
 export * from './document-state.model';
 export * from './font.model';

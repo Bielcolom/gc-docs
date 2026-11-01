@@ -31,7 +31,7 @@ import {
   type TextAnnotation,
   type TextLine,
 } from '@core/models';
-import { PageRenderService, isRenderCancelled } from '@core/pdf';
+import { PageRenderService, isRenderCancelled, sampleTextColors } from '@core/pdf';
 import { DocumentActionsService, LoggerService } from '@core/services';
 import { DocumentStore, EditorStore } from '@core/state';
 import {
@@ -47,7 +47,6 @@ import {
 } from '@core/utils';
 import { InViewportDirective } from '@shared/directives';
 import { EditorCommandsService } from '../../services/editor-commands.service';
-import { sampleTextColors } from '../../services/text-color-sampler';
 import { AnnotationViewComponent } from './annotation-view/annotation-view.component';
 import { FormFieldLayerComponent } from './form-field-layer/form-field-layer.component';
 import { NotePopoverComponent } from './note-popover/note-popover.component';

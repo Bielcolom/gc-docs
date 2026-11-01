@@ -32,6 +32,12 @@ describe('text-layout.utils', () => {
     expect(lines.map((l) => l.text)).toEqual(['primera', 'segunda']);
   });
 
+  it('cada fragmento recuerda qué elemento de la entrada lo originó', () => {
+    const lines = groupTextItems([item('B', 10, 130), item('A2', 30, 100), item('A1', 10, 100)]);
+    expect(lines[0].segments.map((s) => s.item)).toEqual([2, 1]);
+    expect(lines[1].segments.map((s) => s.item)).toEqual([0]);
+  });
+
   it('separa columnas alejadas en líneas distintas', () => {
     const lines = groupTextItems([item('izquierda', 10, 100), item('derecha', 400, 100)]);
     expect(lines).toHaveLength(2);

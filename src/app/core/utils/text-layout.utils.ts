@@ -24,16 +24,21 @@ interface MutableLine {
  * y fragmentos próximos entre sí. Las columnas separadas quedan como líneas distintas.
  */
 export function groupTextItems(items: readonly RawTextItem[]): TextLine[] {
-  const sorted = [...items].sort((a, b) => {
-    const dy = a.baseline - b.baseline;
-    if (Math.abs(dy) > Math.min(a.fontSize, b.fontSize) * SAME_BASELINE) return dy;
-    return a.x - b.x;
-  });
+  const order = items
+    .map((_, index) => index)
+    .sort((i, j) => {
+      const a = items[i];
+      const b = items[j];
+      const dy = a.baseline - b.baseline;
+      if (Math.abs(dy) > Math.min(a.fontSize, b.fontSize) * SAME_BASELINE) return dy;
+      return a.x - b.x;
+    });
 
   const lines: MutableLine[] = [];
   let current: MutableLine | null = null;
 
-  for (const item of sorted) {
+  for (const index of order) {
+    const item = items[index];
     if (current && belongsToLine(current, item)) {
       const gap = item.x - current.end;
       if (
@@ -45,7 +50,13 @@ export function groupTextItems(items: readonly RawTextItem[]): TextLine[] {
       }
       const start = current.text.length;
       current.text += item.text;
-      current.segments.push({ start, end: current.text.length, x: item.x, width: item.width });
+      current.segments.push({
+        start,
+        end: current.text.length,
+        x: item.x,
+        width: item.width,
+        item: index,
+      });
       current.end = Math.max(current.end, item.x + item.width);
       current.width = current.end - current.x;
       current.fontSize = Math.max(current.fontSize, item.fontSize);
@@ -57,7 +68,7 @@ export function groupTextItems(items: readonly RawTextItem[]): TextLine[] {
         baseline: item.baseline,
         fontSize: item.fontSize,
         first: item,
-        segments: [{ start: 0, end: item.text.length, x: item.x, width: item.width }],
+        segments: [{ start: 0, end: item.text.length, x: item.x, width: item.width, item: index }],
         end: item.x + item.width,
       };
       lines.push(current);

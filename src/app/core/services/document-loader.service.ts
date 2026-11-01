@@ -1,10 +1,10 @@
 import { Injectable, inject } from '@angular/core';
 import type { PageRef } from '@core/models';
 import {
-  PasswordRequiredError,
   SourceRegistryService,
   createBlankPdf,
   createPdfFromImages,
+  openWithPassword,
 } from '@core/pdf';
 import { DocumentStore, EditorStore } from '@core/state';
 import { USER_PROMPTS } from '@core/tokens/user-prompts.token';
@@ -87,18 +87,10 @@ export class DocumentLoaderService {
     });
   }
 
-  /** Abre un PDF pidiendo la contraseña tantas veces como haga falta. */
   private async registerWithPassword(bytes: Uint8Array, name: string): Promise<PageRef[]> {
-    let password: string | undefined;
-    for (;;) {
-      try {
-        return await this.sources.register(bytes, name, password);
-      } catch (error) {
-        if (!(error instanceof PasswordRequiredError)) throw error;
-        const answer = await this.prompts.password(name, error.incorrect);
-        if (answer === null) return [];
-        password = answer;
-      }
-    }
+    const pages = await openWithPassword(this.prompts, name, (password) =>
+      this.sources.register(bytes, name, password),
+    );
+    return pages ?? [];
   }
 }

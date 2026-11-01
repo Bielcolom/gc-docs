@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import {
   ACCEPT_IMAGES,
   DocumentActionsService,
@@ -7,17 +7,17 @@ import {
   ThemeService,
 } from '@core/services';
 import { BrandLogoComponent, IconComponent } from '@shared/components';
-import { APP_PATHS } from '@core/constants';
+import { APP_PATHS, converterQuery } from '@core/constants';
 
 interface Capability {
   readonly title: string;
   readonly description: string;
 }
 
-/** Pantalla de inicio: abrir un PDF, empezar en blanco o convertir imágenes. */
+/** Pantalla de inicio: abrir un PDF, empezar en blanco, convertir imágenes o ir al conversor. */
 @Component({
   selector: 'app-welcome-page',
-  imports: [IconComponent, BrandLogoComponent],
+  imports: [RouterLink, IconComponent, BrandLogoComponent],
   templateUrl: './welcome-page.component.html',
   styleUrl: './welcome-page.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -29,6 +29,8 @@ export class WelcomePageComponent {
   protected readonly theme = inject(ThemeService);
 
   protected readonly isDraggingOver = signal(false);
+  protected readonly paths = APP_PATHS;
+  protected readonly pdfToDocs = converterQuery({ from: 'pdf', to: 'docx' });
 
   protected readonly capabilities: readonly Capability[] = [
     {
@@ -45,6 +47,10 @@ export class WelcomePageComponent {
     {
       title: 'Remata el documento',
       description: 'Marca de agua, números de página y propiedades.',
+    },
+    {
+      title: 'Pásalo a Google Docs',
+      description: 'Convierte un PDF en un documento que puedes seguir editando.',
     },
   ];
 

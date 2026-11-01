@@ -57,6 +57,14 @@ Editor de PDF completo que funciona en el navegador. Abre un PDF, cambia su text
 - Descargar el PDF, guardarlo como imágenes PNG (72, 150 o 300 ppp) o imprimirlo.
 - Abre PDFs protegidos con contraseña.
 
+### Convertir
+
+- **PDF → Google Docs** (`/convertir`): genera un `.docx` pensado para importarlo en Google Docs, con
+  párrafos que fluyen, títulos (Título 1–3), negrita, cursiva, colores, columnas leídas en orden,
+  tablas sencillas como filas con tabuladores e imágenes. Los PDF escaneados se insertan como imagen.
+- El selector «De ⇄ A» funciona en los dos sentidos; los que aún no existen se muestran como
+  «próximamente».
+
 ### Comodidad
 
 - Deshacer y rehacer ilimitado (`Ctrl+Z` / `Ctrl+⇧+Z`).
@@ -80,6 +88,7 @@ Es el mismo enfoque que usan la mayoría de editores web. El texto original sigu
 - **[Angular 22](https://angular.dev)**: componentes _standalone_, **signals**, sin Zone.js, rutas con _lazy loading_, Reactive Forms tipados y **Angular CDK** (diálogos, menús y arrastrar y soltar).
 - **pdf.js** para mostrar las páginas, extraer texto y leer formularios.
 - **pdf-lib** + **fontkit** para escribir el PDF final y **JSZip** para descargar varios archivos.
+- **[docx](https://docx.js.org)** para generar los documentos de Google Docs.
   Estas librerías se cargan solo cuando hacen falta: la página de inicio pesa unos 140 kB comprimida.
 - Fuentes incluidas en el proyecto (Roboto, Lora, Roboto Mono, Dancing Script, Great Vibes, Caveat, Bricolage Grotesque y Schibsted Grotesk): la app no depende de servicios externos.
 - Calidad: TypeScript estricto, **ESLint** (con reglas de accesibilidad), **Prettier**, tests con **Vitest**, _git hooks_ con Husky y commitlint, y CI/CD con GitHub Actions.
@@ -96,6 +105,7 @@ src/app/
     ├── welcome/   Pantalla de inicio
     ├── editor/    Visor, herramientas, panel lateral e inspector
     ├── organizer/ Cuadrícula para ordenar páginas y documentos
+    ├── converter/ Conversor entre formatos (PDF → Google Docs)
     └── dialogs/   Firma, sellos, marca de agua, numeración, dividir…
 ```
 
