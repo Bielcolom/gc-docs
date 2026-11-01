@@ -5,6 +5,8 @@ export interface TextSegment {
   readonly end: number;
   readonly x: number;
   readonly width: number;
+  /** Posición del elemento de pdf.js en la lista que recibió `groupTextItems()`. */
+  readonly item: number;
 }
 
 /** Una línea de texto del PDF, en el espacio base de la página. */

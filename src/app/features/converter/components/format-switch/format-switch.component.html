@@ -1,0 +1,39 @@
+<div class="switch" role="group" aria-label="Sentido de la conversión">
+  <label class="side">
+    <span class="side__caption">De</span>
+    <span class="side__field">
+      <select class="side__select" [disabled]="disabled()" (change)="pickFrom($event)">
+        @for (option of fromOptions(); track option.id) {
+          <option [value]="option.id" [selected]="option.id === from()">{{ option.label }}</option>
+        }
+      </select>
+      <app-icon class="side__chevron" name="chevronDown" [size]="18" />
+    </span>
+    <span class="side__hint">{{ formats[from()].hint }}</span>
+  </label>
+
+  <button
+    type="button"
+    class="swap"
+    [disabled]="disabled()"
+    [attr.aria-label]="swapLabel()"
+    [title]="swapLabel()"
+    [style.--turns]="turns()"
+    (click)="swap()"
+  >
+    <app-icon name="swap" [size]="20" />
+  </button>
+
+  <label class="side side--to">
+    <span class="side__caption">A</span>
+    <span class="side__field">
+      <select class="side__select" [disabled]="disabled()" (change)="pickTo($event)">
+        @for (option of toOptions(); track option.id) {
+          <option [value]="option.id" [selected]="option.id === to()">{{ option.label }}</option>
+        }
+      </select>
+      <app-icon class="side__chevron" name="chevronDown" [size]="18" />
+    </span>
+    <span class="side__hint">{{ formats[to()].hint }}</span>
+  </label>
+</div>

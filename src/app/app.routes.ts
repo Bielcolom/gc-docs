@@ -17,6 +17,14 @@ export const routes: Routes = [
       ),
   },
   {
+    path: ROUTE_SEGMENTS.converter,
+    title: 'Convertir · GC Docs',
+    loadComponent: () =>
+      import('@features/converter/converter-page/converter-page.component').then(
+        (m) => m.ConverterPageComponent,
+      ),
+  },
+  {
     path: ROUTE_SEGMENTS.workspace,
     canActivate: [documentLoadedGuard],
     loadComponent: () =>

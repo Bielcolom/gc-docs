@@ -1,0 +1,165 @@
+<div
+  class="desk"
+  (dragover)="onDragOver($event)"
+  (dragleave)="isDraggingOver.set(false)"
+  (drop)="onDrop($event)"
+>
+  <header class="header">
+    <a class="btn btn--ghost back" [routerLink]="paths.welcome">
+      <app-icon name="arrowLeft" [size]="17" /> Inicio
+    </a>
+    <app-brand-logo />
+    <button
+      type="button"
+      class="btn btn--icon theme-toggle"
+      [attr.aria-label]="
+        theme.theme() === 'dark' ? 'Cambiar a tema claro' : 'Cambiar a tema oscuro'
+      "
+      (click)="theme.toggle()"
+    >
+      <app-icon [name]="theme.theme() === 'dark' ? 'sun' : 'moon'" />
+    </button>
+  </header>
+
+  <main class="content">
+    <h1 class="title">Convierte documentos</h1>
+    <p class="lede">
+      Elige el sentido de la conversión y suelta el archivo. Todo ocurre en tu navegador: el archivo
+      no se sube a ningún servidor.
+    </p>
+
+    <article class="sheet" [class.is-drop-target]="isDraggingOver()">
+      <app-format-switch
+        [from]="from()"
+        [to]="to()"
+        [disabled]="state().kind === 'working'"
+        (pairChange)="setPair($event)"
+      />
+
+      <section class="zone" aria-live="polite">
+        @let current = state();
+        @switch (current.kind) {
+          @case ('working') {
+            <div class="zone__body">
+              <p class="zone__title">Convirtiendo «{{ current.fileName }}»…</p>
+              @if (current.progress; as progress) {
+                <progress
+                  class="progress"
+                  [value]="progress.done"
+                  [max]="progress.total"
+                ></progress>
+                <p class="zone__text">
+                  @if (progress.done < progress.total) {
+                    Leyendo la página {{ progress.done + 1 }} de {{ progress.total }}
+                  } @else {
+                    Generando el documento…
+                  }
+                </p>
+              } @else {
+                <progress class="progress"></progress>
+                <p class="zone__text">Abriendo el archivo…</p>
+              }
+              <button type="button" class="btn" (click)="cancel()">Cancelar</button>
+            </div>
+          }
+
+          @case ('done') {
+            <div class="zone__body">
+              <span class="zone__badge zone__badge--ok" aria-hidden="true">
+                <app-icon name="check" [size]="22" />
+              </span>
+              <p class="zone__title">«{{ current.result.fileName }}» descargado</p>
+
+              @if (current.result.warnings.length) {
+                <ul class="warnings">
+                  @for (warning of current.result.warnings; track warning) {
+                    <li>{{ warning }}</li>
+                  }
+                </ul>
+              }
+
+              @if (to() === 'docx') {
+                <div class="tip">
+                  <strong>Ábrelo en Google Docs</strong>
+                  <ol>
+                    <li>
+                      En
+                      <a
+                        href="https://drive.google.com/drive/my-drive"
+                        target="_blank"
+                        rel="noopener"
+                        >Google Drive</a
+                      >, pulsa <em>Nuevo › Subir archivo</em> y elige el .docx.
+                    </li>
+                    <li>
+                      Haz clic derecho sobre él y elige <em>Abrir con › Documentos de Google</em>.
+                    </li>
+                  </ol>
+                </div>
+              }
+
+              <div class="zone__actions">
+                <button type="button" class="btn" (click)="downloadAgain(current.result)">
+                  <app-icon name="download" [size]="16" /> Descargar de nuevo
+                </button>
+                <button type="button" class="btn btn--primary" (click)="choose()">
+                  Convertir otro
+                </button>
+              </div>
+            </div>
+          }
+
+          @case ('error') {
+            <div class="zone__body">
+              <span class="zone__badge zone__badge--error" aria-hidden="true">
+                <app-icon name="info" [size]="22" />
+              </span>
+              <p class="zone__text zone__text--error" role="alert">{{ current.message }}</p>
+              <div class="zone__actions">
+                <button type="button" class="btn" (click)="reset()">Volver</button>
+                @if (converter()) {
+                  <button type="button" class="btn btn--primary" (click)="choose()">
+                    Elegir otro archivo
+                  </button>
+                }
+              </div>
+            </div>
+          }
+
+          @default {
+            @if (converter(); as definition) {
+              <div class="zone__body zone__body--drop">
+                <app-icon class="zone__icon" name="filePlus" [size]="34" [strokeWidth]="1.5" />
+                <p class="zone__title">Suelta aquí tu {{ formats[from()].label }}</p>
+                <button type="button" class="btn btn--primary btn--lg" (click)="choose()">
+                  <app-icon name="folder" [size]="18" /> Elegir {{ formats[from()].label }}
+                </button>
+                <p class="zone__text">{{ definition.description }}</p>
+              </div>
+            } @else {
+              <div class="zone__body">
+                <p class="zone__title">
+                  De {{ formats[from()].label }} a {{ formats[to()].label }}: próximamente
+                </p>
+                <p class="zone__text">Este sentido todavía no está disponible. Ya puedes usar:</p>
+                <div class="zone__actions">
+                  @for (option of alternatives; track option.id) {
+                    <button type="button" class="btn" (click)="setPair(option)">
+                      {{ formats[option.from].label }}
+                      <app-icon name="arrowRight" [size]="15" />
+                      {{ formats[option.to].label }}
+                    </button>
+                  }
+                </div>
+              </div>
+            }
+          }
+        }
+        <div class="zone__drop-hint" aria-hidden="true">
+          <app-icon name="download" [size]="28" />
+          <span>Suelta para convertir</span>
+        </div>
+      </section>
+    </article>
+  </main>
+</div>

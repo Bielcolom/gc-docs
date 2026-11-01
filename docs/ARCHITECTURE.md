@@ -54,6 +54,7 @@ src/
 │   ├── core/
 │   │   ├── annotations/         Factoría: cómo se crea cada tipo de anotación
 │   │   ├── constants/           Valores fijos (tamaños, paletas, rutas, claves de almacenamiento)
+│   │   ├── convert/             Formatos, registro de conversores y cada conversor (bajo demanda)
 │   │   ├── export/              Escritura del PDF final con pdf-lib (se carga bajo demanda)
 │   │   ├── fonts/               Catálogo de fuentes, métricas y registro de @font-face
 │   │   ├── guards/              documentLoadedGuard
@@ -77,6 +78,7 @@ src/
 │       │   ├── components/      Componentes de presentación
 │       │   └── services/        Lógica propia del editor (comandos, búsqueda, atajos)
 │       ├── organizer/           Cuadrícula de páginas y documentos
+│       ├── converter/           Conversor entre formatos con selector «De ⇄ A»
 │       └── dialogs/             Firma, sello, marca de agua, numeración, dividir…
 ├── environments/                Configuración por entorno
 ├── styles/                      Tokens de diseño, mixins y estilos globales (SCSS)
@@ -93,6 +95,7 @@ Cada componente vive en su carpeta con tres archivos: `nombre.component.ts`, `.h
 | `/`                    | `WelcomePageComponent`   |                                     |
 | `/documento/editar`    | `EditorPageComponent`    | protegida por `documentLoadedGuard` |
 | `/documento/organizar` | `OrganizerPageComponent` | protegida por `documentLoadedGuard` |
+| `/convertir?de=…&a=…`  | `ConverterPageComponent` | el sentido va en la URL             |
 
 Todas las pantallas se cargan con `loadComponent` (lazy loading). Los segmentos y destinos están
 en `core/constants/routes.constants.ts` (`APP_PATHS`) para no repetir cadenas por el código.
@@ -145,10 +148,50 @@ componente ──llama──▶ DocumentStore.rotatePages(ids)
   validadores propios (`pageRangesValidator`).
 - Modales, menús y arrastrar y soltar con **Angular CDK** (`Dialog`, `Menu`, `DragDrop`).
 
+## Conversores
+
+`core/convert/` convierte archivos de un formato a otro sin que la interfaz conozca ningún
+conversor concreto. Todo parte de dos catálogos:
+
+- **`FILE_FORMATS`** (`file-formats.ts`): los formatos que existen (nombre visible, extensiones,
+  tipos MIME). `detectFormat()` reconoce el de un archivo.
+- **`CONVERTERS`** (`converter-registry.ts`): un `ConverterDefinition` por sentido (`from` → `to`)
+  con un `load()` que importa el conversor bajo demanda. Cada conversor es un servicio que
+  implementa `Converter.convert(file, { onProgress, signal })`.
+
+La pantalla `/convertir` muestra todos los formatos en los dos lados del selector «De ⇄ A». Si
+para un sentido no hay conversor, sale como «próximamente»; al soltar un archivo de otro formato,
+cambia el sentido sola. Para añadir uno nuevo (p. ej. DOCX → PDF):
+
+1. Si el formato es nuevo, añádelo a `FileFormatId` (`core/models/conversion.model.ts`) y a
+   `FILE_FORMATS`.
+2. Crea `core/convert/<origen>-to-<destino>/` con un servicio `providedIn: 'root'` que implemente
+   `Converter`.
+3. Regístralo en `CONVERTERS`. La interfaz no necesita cambios.
+
+### PDF → Google Docs
+
+Un PDF guarda glifos en coordenadas, no párrafos, así que la conversión reconstruye la estructura
+en tres pasos independientes (y probados por separado):
+
+```
+pdf-page-reader   pdf.js → líneas con formato (fuente, negrita, color muestreado) e imágenes recortadas
+       │
+layout            orden de lectura (corte XY: columnas y filas), párrafos, títulos, márgenes
+       │
+docx-writer       docx → .docx con lo que Google Docs importa bien
+```
+
+Decisiones tomadas por Google Docs: un único tamaño de página con saltos manuales, interlineado
+múltiple (no exacto), títulos con los estilos `Heading 1–3`, fuentes que Docs tiene (o la estándar
+más parecida) e imágenes en línea. Los números de página se quitan porque en un documento que
+fluye dejan de cuadrar.
+
 ## Rendimiento
 
 - **Carga bajo demanda de librerías pesadas**: pdf.js (~450 kB), pdf-lib + fontkit + JSZip
-  (~1,4 MB) se descargan con `import()` la primera vez que se necesitan. El bundle inicial pesa
+  (~1,4 MB) y docx (~420 kB, solo al convertir) se descargan con `import()` la primera vez que se
+  necesitan. El bundle inicial pesa
   ~535 kB (~140 kB comprimido). Los presupuestos de `angular.json` fallan la compilación si crece.
 - **Render solo de lo visible**: cada página y miniatura usa `InViewportDirective`
   (IntersectionObserver); al salir de pantalla se libera su canvas.

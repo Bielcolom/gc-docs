@@ -30,56 +30,64 @@ export class TextExtractionService {
     const pdfPage = await this.sources.getPageFor(page);
     let lines = this.cache.get(pdfPage);
     if (!lines) {
-      lines = this.extract(pdfPage, page);
+      lines = readTextItems(pdfPage, page.viewportTransform).then(groupTextItems);
       this.cache.set(pdfPage, lines);
     }
     return lines;
   }
+}
 
-  private async extract(pdfPage: PDFPageProxy, page: PageRef): Promise<TextLine[]> {
-    const content = await pdfPage.getTextContent();
-    const styles = (content as { styles?: Record<string, PdfJsTextStyle> }).styles ?? {};
-    const vt = page.viewportTransform;
-    const scaleX = Math.hypot(vt[0], vt[1]);
-    const items: RawTextItem[] = [];
+/**
+ * Fragmentos de texto horizontal de una página, pasados al espacio base con `viewportTransform`.
+ * El nombre real de cada fuente solo se conoce si pdf.js ya ha cargado las fuentes (al pintar la
+ * página o al pedir su lista de operaciones).
+ */
+export async function readTextItems(
+  pdfPage: PDFPageProxy,
+  viewportTransform: Matrix,
+): Promise<RawTextItem[]> {
+  const content = await pdfPage.getTextContent();
+  const styles = (content as { styles?: Record<string, PdfJsTextStyle> }).styles ?? {};
+  const vt = viewportTransform;
+  const scaleX = Math.hypot(vt[0], vt[1]);
+  const items: RawTextItem[] = [];
 
-    for (const raw of content.items) {
-      if (!('str' in raw)) continue;
-      const item = raw as PdfJsTextItem;
-      if (!item.str.trim()) continue;
-      const t = multiply(vt, item.transform as unknown as Matrix);
-      // Solo se edita el texto horizontal
-      if (Math.abs(t[1]) > 0.01 * Math.abs(t[0]) || t[0] <= 0) continue;
-      const fontSize = Math.hypot(t[2], t[3]);
-      if (!fontSize) continue;
-      const style = styles[item.fontName] ?? {};
-      items.push({
-        text: item.str,
-        x: t[4],
-        baseline: t[5],
-        width: item.width * scaleX,
-        fontSize,
-        fontName: item.fontName,
-        fontRealName: this.realFontName(pdfPage, item.fontName),
-        fontFamily: style.fontFamily ?? 'sans-serif',
-        ascent: style.ascent && style.ascent > 0.2 ? style.ascent : DEFAULT_ASCENT,
-        descent: style.descent ? Math.abs(style.descent) : DEFAULT_DESCENT,
-      });
-    }
-    return groupTextItems(items);
+  for (const raw of content.items) {
+    if (!('str' in raw)) continue;
+    const item = raw as PdfJsTextItem;
+    if (!item.str.trim()) continue;
+    const t = multiply(vt, item.transform as unknown as Matrix);
+    // Solo se edita el texto horizontal
+    if (Math.abs(t[1]) > 0.01 * Math.abs(t[0]) || t[0] <= 0) continue;
+    const fontSize = Math.hypot(t[2], t[3]);
+    if (!fontSize) continue;
+    const style = styles[item.fontName] ?? {};
+    items.push({
+      text: item.str,
+      x: t[4],
+      baseline: t[5],
+      width: item.width * scaleX,
+      fontSize,
+      fontName: item.fontName,
+      fontRealName: realFontName(pdfPage, item.fontName),
+      fontFamily: style.fontFamily ?? 'sans-serif',
+      ascent: style.ascent && style.ascent > 0.2 ? style.ascent : DEFAULT_ASCENT,
+      descent: style.descent ? Math.abs(style.descent) : DEFAULT_DESCENT,
+    });
   }
+  return items;
+}
 
-  /** Nombre real de la fuente, si pdf.js ya la ha cargado al pintar la página. */
-  private realFontName(page: PDFPageProxy, fontName: string): string {
-    try {
-      const objs = (
-        page as unknown as {
-          commonObjs?: { has(id: string): boolean; get(id: string): { name?: string } };
-        }
-      ).commonObjs;
-      return objs?.has(fontName) ? String(objs.get(fontName)?.name ?? '') : '';
-    } catch {
-      return '';
-    }
+/** Nombre real de la fuente, si pdf.js ya la ha cargado al pintar la página. */
+function realFontName(page: PDFPageProxy, fontName: string): string {
+  try {
+    const objs = (
+      page as unknown as {
+        commonObjs?: { has(id: string): boolean; get(id: string): { name?: string } };
+      }
+    ).commonObjs;
+    return objs?.has(fontName) ? String(objs.get(fontName)?.name ?? '') : '';
+  } catch {
+    return '';
   }
 }

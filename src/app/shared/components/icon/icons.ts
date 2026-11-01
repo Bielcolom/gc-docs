@@ -80,6 +80,7 @@ export const ICONS = {
   toEnd: 'M19 4v16 M5 12h10 M11 8l4 4-4 4',
   arrowLeft: 'M19 12H5 M11 6l-6 6 6 6',
   arrowRight: 'M5 12h14 M13 6l6 6-6 6',
+  swap: 'M4 8h15 M15 4l4 4-4 4 M20 16H5 M9 12l-4 4 4 4',
   grip: 'M9 6h.01 M15 6h.01 M9 12h.01 M15 12h.01 M9 18h.01 M15 18h.01',
 } as const;
 

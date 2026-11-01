@@ -29,6 +29,9 @@
         <button type="button" class="btn" (click)="convertImages()">
           <app-icon name="image" [size]="16" /> Convertir imágenes a PDF
         </button>
+        <a class="btn" [routerLink]="paths.converter" [queryParams]="pdfToDocs">
+          <app-icon name="swap" [size]="16" /> PDF a Google Docs
+        </a>
       </div>
 
       <div class="sheet__drop-hint" aria-hidden="true">
