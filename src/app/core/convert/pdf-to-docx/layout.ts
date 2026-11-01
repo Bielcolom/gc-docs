@@ -21,6 +21,7 @@ import {
   type LayoutBox,
   type OrderedBox,
 } from './reading-order';
+import { PAGE_NUMBER, extractRunningContent, type RunningPart } from './running-content';
 
 /** Tolerancias en proporción del tamaño de letra, salvo que se diga otra cosa. */
 const MAX_LINE_GAP = 0.8;
@@ -45,12 +46,21 @@ const MAX_BOTTOM_MARGIN = 36;
 /** Una imagen que tapa casi toda la página es un fondo (o un escaneo). */
 const BACKGROUND_COVERAGE = 0.85;
 
-const DEFAULT_MARGINS: Margins = { top: 72, right: 72, bottom: 72, left: 72 };
+/** Distancia por defecto del borde a la cabecera y al pie, en puntos. */
+const HEADER_DISTANCE = 36;
+/** Separación mínima entre la cabecera (o el pie) y el texto. */
+const HEADER_GAP = 6;
+
+const DEFAULT_MARGINS: Margins = {
+  top: 72,
+  right: 72,
+  bottom: 72,
+  left: 72,
+  header: HEADER_DISTANCE,
+  footer: HEADER_DISTANCE,
+};
 
 const BULLET = /^\s*([•●○◦▪▫■□‣⁃∙·*–-]|\d{1,3}[.)]|[a-zA-Z][.)])\s/;
-/** "3", "- 3 -", "Página 3", "Page 3 of 10", "3 / 10"… */
-const PAGE_NUMBER =
-  /^\s*(?:(?:p[áa]g(?:ina)?\.?|page|p\.)\s*)?[-–—]?\s*\d{1,4}\s*(?:(?:de|of|\/)\s*\d{1,4})?\s*[-–—]?\s*$/i;
 /** Franja superior e inferior de la página donde están las cabeceras y los pies. */
 const PAGE_EDGE = 0.1;
 
@@ -68,11 +78,68 @@ type Placed = PlacedLine | { readonly image: PageImage; readonly column: Column 
 
 /** Convierte las páginas leídas del PDF en el documento listo para escribir. */
 export function buildLayout(pages: readonly PageContent[]): DocumentLayout {
-  const cleaned = pages.map(cleanPage);
+  const running = extractRunningContent(pages);
+  const cleaned = running.bodies.map(cleanPage);
   const { width: pageWidth, height: pageHeight } = mostCommonSize(cleaned);
-  const margins = documentMargins(cleaned, pageWidth, pageHeight);
+  const margins = withRoomFor(
+    documentMargins(cleaned, pageWidth, pageHeight),
+    running.header,
+    running.footer,
+  );
   const laidOut = cleaned.map((page) => layoutPage(page, margins, pageWidth));
-  return { pageWidth, pageHeight, margins, pages: markHeadings(laidOut) };
+  const runningBlocks = (part: RunningPart | null) =>
+    part ? layoutPage(part.page, margins, pageWidth, part.top) : [];
+  return {
+    pageWidth,
+    pageHeight,
+    margins,
+    pages: markHeadings(laidOut),
+    header: runningBlocks(running.header),
+    footer: runningBlocks(running.footer),
+    titlePage: running.titlePage,
+    firstPageNumber: running.firstPageNumber,
+  };
+}
+
+/**
+ * Coloca la cabecera y el pie a la misma distancia del borde que en el PDF y aparta el texto
+ * para que no se monte encima.
+ */
+function withRoomFor(
+  margins: Margins,
+  header: RunningPart | null,
+  footer: RunningPart | null,
+): Margins {
+  // El ancho del texto también tiene que abarcar la cabecera y el pie (sus tabuladores)
+  const sides = [header, footer].flatMap((part) =>
+    part
+      ? [...part.page.lines, ...part.page.images].map((b) => ({
+          left: b.x,
+          right: part.page.width - (b.x + b.w),
+        }))
+      : [],
+  );
+  const side = (current: number, values: number[]) =>
+    Math.max(MIN_MARGIN, Math.min(current, ...values));
+  return {
+    ...margins,
+    left: side(
+      margins.left,
+      sides.map((s) => s.left),
+    ),
+    right: side(
+      margins.right,
+      sides.map((s) => s.right),
+    ),
+    header: header ? Math.max(MIN_MARGIN, header.top) : Math.min(margins.top, HEADER_DISTANCE),
+    footer: footer
+      ? Math.max(MIN_MARGIN, footer.page.height - footer.bottom)
+      : Math.min(margins.bottom, HEADER_DISTANCE),
+    top: header ? Math.max(margins.top, header.bottom + HEADER_GAP) : margins.top,
+    bottom: footer
+      ? Math.max(margins.bottom, footer.page.height - footer.top + HEADER_GAP)
+      : margins.bottom,
+  };
 }
 
 /** `true` si la página no tiene texto y es una única imagen grande: un escaneo. */
@@ -86,7 +153,7 @@ export function isScannedPage(page: PageContent): boolean {
  * Quita lo que sobra en un documento que fluye:
  * - las imágenes de fondo de las páginas con texto (el texto ya va como texto);
  * - el texto que queda dentro de una imagen (ya está en el recorte);
- * - los números de página, que dejan de cuadrar en cuanto el texto se reparte de otra manera.
+ * - los números de página sueltos que no forman parte de un pie (los del pie pasan a ser campos).
  */
 export function cleanPage(page: PageContent): PageContent {
   const images = page.lines.length
@@ -104,7 +171,13 @@ function isPageNumber(line: StyledLine, pageHeight: number): boolean {
   return atEdge && PAGE_NUMBER.test(textOf(line));
 }
 
-function layoutPage(page: PageContent, margins: Margins, pageWidth: number): Block[] {
+/** @param top Dónde empieza la zona: el margen superior o, para la cabecera y el pie, su borde. */
+function layoutPage(
+  page: PageContent,
+  margins: Margins,
+  pageWidth: number,
+  top = margins.top,
+): Block[] {
   const items: Item[] = [
     ...page.lines.map((line) => ({ ...line, kind: 'line' as const, line })),
     ...page.images.map((image) => ({
@@ -121,7 +194,7 @@ function layoutPage(page: PageContent, margins: Margins, pageWidth: number): Blo
     nested: false,
   };
   const blocks: Block[] = [];
-  let previousBottom = margins.top;
+  let previousBottom = top;
   let paragraph: PlacedLine[] = [];
 
   const flush = () => {
@@ -366,6 +439,8 @@ export function mergeRuns(runs: readonly ParagraphRun[]): ParagraphRun[] {
 
 function sameStyle(a: StyledRun, b: StyledRun): boolean {
   return (
+    !a.field &&
+    !b.field &&
     a.fontSize === b.fontSize &&
     a.font === b.font &&
     a.bold === b.bold &&
@@ -446,9 +521,10 @@ function documentMargins(pages: readonly PageContent[], width: number, height: n
     ];
   });
   if (!extents.length) return DEFAULT_MARGINS;
-  const margin = (side: keyof Margins, max: number) =>
+  const margin = (side: 'left' | 'right' | 'top' | 'bottom', max: number) =>
     clamp(Math.min(...extents.map((e) => e[side])), MIN_MARGIN, max);
   return {
+    ...DEFAULT_MARGINS,
     left: margin('left', width * 0.3),
     right: margin('right', width * 0.3),
     top: margin('top', height * 0.25),

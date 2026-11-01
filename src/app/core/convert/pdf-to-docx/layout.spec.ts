@@ -152,6 +152,27 @@ describe('buildLayout', () => {
     expect(buildLayout([page([line('a', 50, 50)]), page([])]).pages).toHaveLength(2);
   });
 
+  it('lleva la cabecera y el pie aparte y deja sitio para ellos en los márgenes', () => {
+    const pages = [1, 2].map((n) =>
+      page([
+        line('ACME', 50, 20),
+        line(`Texto corto ${n}`, 80, 200),
+        line(`Página ${n}`, 480, 760),
+      ]),
+    );
+    const layout = buildLayout(pages);
+    expect(layout.pages.flat().map((b) => b.kind === 'paragraph' && text(b))).toEqual([
+      'Texto corto 1',
+      'Texto corto 2',
+    ]);
+    expect(paragraphs(layout.header).map(text)).toEqual(['ACME']);
+    expect(paragraphs(layout.footer).map(text)).toEqual(['Página 1']);
+    // El ancho del texto llega hasta el pie, aunque el cuerpo sea más estrecho
+    expect(layout.margins.left).toBe(50);
+    expect(layout.margins.right).toBe(600 - (480 + 'Página 1'.length * CHAR));
+    expect(layout.margins.footer).toBe(800 - 770);
+  });
+
   it('pone la imagen antes que el pie de foto que tiene al lado', () => {
     const layout = buildLayout([
       page([line('Figura 1. Pie de foto.', 200, 130)], [image(50, 100, 120, 60)]),

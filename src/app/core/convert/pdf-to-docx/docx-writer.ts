@@ -1,11 +1,14 @@
 import {
   AlignmentType,
   Document,
+  Footer,
+  Header,
   HeadingLevel,
   ImageRun,
   LineRuleType,
   Packer,
   PageBreak,
+  PageNumber,
   PageOrientation,
   Paragraph,
   type ParagraphChild,
@@ -49,11 +52,14 @@ export interface DocxMetadata {
  * - un único tamaño de página (Docs no admite varios) y saltos de página manuales entre las del PDF;
  * - interlineado como múltiplo (Docs ignora el "exacto" y el "mínimo");
  * - títulos con los estilos "Heading 1–3", que Docs convierte en sus Títulos 1–3 (índice y esquema);
- * - imágenes en línea con el texto, que Docs nunca descoloca.
+ * - imágenes en línea con el texto, que Docs nunca descoloca;
+ * - cabecera y pie de verdad, con el número de página y el total como campos.
  */
 export async function writeDocx(layout: DocumentLayout, metadata: DocxMetadata): Promise<Blob> {
   const landscape = layout.pageWidth > layout.pageHeight;
   const { margins } = layout;
+  // Con portada, la primera página lleva una cabecera y un pie vacíos
+  const empty = () => [new Paragraph({})];
   const document = new Document({
     creator: 'GC Docs',
     title: metadata.title,
@@ -84,11 +90,26 @@ export async function writeDocx(layout: DocumentLayout, metadata: DocxMetadata):
               right: twips(margins.right),
               bottom: twips(margins.bottom),
               left: twips(margins.left),
-              header: twips(Math.min(margins.top, 36)),
-              footer: twips(Math.min(margins.bottom, 36)),
+              header: twips(margins.header),
+              footer: twips(margins.footer),
             },
+            pageNumbers:
+              layout.firstPageNumber !== 1 ? { start: layout.firstPageNumber } : undefined,
           },
+          titlePage: layout.titlePage,
         },
+        headers: layout.header.length
+          ? {
+              default: new Header({ children: blockParagraphs(layout.header) }),
+              first: layout.titlePage ? new Header({ children: empty() }) : undefined,
+            }
+          : undefined,
+        footers: layout.footer.length
+          ? {
+              default: new Footer({ children: blockParagraphs(layout.footer) }),
+              first: layout.titlePage ? new Footer({ children: empty() }) : undefined,
+            }
+          : undefined,
         children: layout.pages.flatMap((blocks, index) => pageParagraphs(blocks, index > 0)),
       },
     ],
@@ -106,20 +127,33 @@ function pageParagraphs(blocks: readonly Block[], breakBefore: boolean): Paragra
   );
 }
 
+function blockParagraphs(blocks: readonly Block[]): Paragraph[] {
+  return blocks.map((block) =>
+    block.kind === 'image' ? imageParagraph(block, false) : textParagraph(block, false),
+  );
+}
+
 function textParagraph(block: ParagraphBlock, breakBefore: boolean): Paragraph {
   const children: ParagraphChild[] = breakBefore ? [new PageBreak()] : [];
   for (const run of block.runs) {
+    if ('tab' in run) {
+      children.push(new TextRun({ children: [new Tab()] }));
+      continue;
+    }
+    const format = {
+      font: run.font,
+      size: Math.round(run.fontSize * 2),
+      bold: run.bold,
+      italics: run.italic,
+      color: run.color,
+    };
     children.push(
-      'tab' in run
-        ? new TextRun({ children: [new Tab()] })
-        : new TextRun({
-            text: run.text,
-            font: run.font,
-            size: Math.round(run.fontSize * 2),
-            bold: run.bold,
-            italics: run.italic,
-            color: run.color,
-          }),
+      run.field
+        ? new TextRun({
+            ...format,
+            children: [run.field === 'page' ? PageNumber.CURRENT : PageNumber.TOTAL_PAGES],
+          })
+        : new TextRun({ ...format, text: run.text }),
     );
   }
   const first = block.firstLineIndent;
