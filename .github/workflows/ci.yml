@@ -54,7 +54,7 @@ jobs:
       # sirve 404.html, que es la propia app, y el router se encarga del resto.
       - name: Fallback para las rutas de la SPA
         run: cp dist/gc-docs/browser/index.html dist/gc-docs/browser/404.html
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: dist/gc-docs/browser
 
